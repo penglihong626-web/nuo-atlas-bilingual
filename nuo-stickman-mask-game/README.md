@@ -1,53 +1,61 @@
-# 傩面具 3D 地图收集小游戏
+# 趣味小游戏 · 傩火行旅
 
-这是一个独立静态包，可以直接部署到网站目录，也可以用 `iframe` 或 `NuoStickmanGame.mount()` 嵌入现有页面。玩法是 3D 星图地图闯关探索：玩家在地图中移动、跑动和跳跃，穿过火塘村寨、溪谷木桥、山脊密林、海岛祭场四类地形，先激活每关机关，再按当前目标顺序收集面具并解锁下一段路线。
+当前入口为中国省域地图探索。操控小人走到省份，阅读当地面具线索，从右侧行囊选一道具，再点“使用道具”。省份、当前面具和道具三项相合，点亮一张面具；十张全亮通关。同省各面具独立计数，整省完成后地表亮起。
 
-## 玩法控制
+## 操作
 
-- 点击地图：移动到目标位置
-- WASD / 方向键：行走与跑动
-- 空格 / J / “跳跃”按钮：跳跃
-- E / “激活”按钮：靠近心火、石板、纹路或祭台后开启机关
-- 靠近当前目标的发光面具节点：按 Enter 或点击“收集”完成采集；收齐本关面具后通关
-- F：追踪当前目标，优先前往未激活机关，其次前往当前目标面具
-- P：暂停 / 继续
-- R：打开重置菜单；C：回到中心
-- 1 / 2：切换中国代表 / 世界代表图鉴
-- H / ?：打开或关闭快捷键面板；Esc：关闭菜单或暂停
-- “重置”按钮：打开游戏内重置菜单，可回到中心、重置本关或重新开始全部进度
-- 高障碍需要绕行；低障碍可以跳过；火塘、雾区会减速，巡游火盏会弹开角色
-- 每关通关时会显示本关面具祭台，作为本关奖励展示
+- 点击地图陆地或灯台：小人沿陆地路径行走；并非瞬移。
+- 电脑可用方向键 / WASD 手动移动，沿省界判断位置；手机轻触地图即可行走。已移除底部四个方向按钮，将空间用于地图。
+- 步行动画按实际移动距离推进，手臂、膝盖和抬脚同步；停下自然回到站姿，继续走时接续上一次步伐。
+- 同省面具：在场景下方切换。
+- 默认拉近的倾斜俯视镜头，以原站的缓动速度跟随小人；人物保持在中部偏下。地图根据场景宽高铺满，手机同样使用近景。
+- 放大、缩小、全图：查看全图后可点“跟随”回到小人；开始移动也会自动回到跟随视角。系统开启减少动态效果时镜头直接跟随，不作缓动。
+- 行囊可滚动；没有计时和扣分。
+- 玩法、面具册和通关页使用原生弹窗。离屏、失焦、切后台或开弹窗时停止行走。
 
-## 本地预览
+## 十项任务
 
-```bash
-py -m http.server 8777 --bind 127.0.0.1
-```
+|省份|面具|道具|用途|
+|---|---|---|---|
+|贵州|判官|笔与印|地方剧目记录|
+|福建|增长天王|双尺|大源表演线索|
+|福建|弥勒佛|木鱼|邵武传承人表演线索|
+|广西|土地|刻刀|木雕制作工具|
+|湖南|开山|开山斧|平云村角色记录|
+|贵州|钟馗|轮廓拼片|照片观察道具|
+|广西|雷公|雨纹牌|用途联想道具|
+|贵州|傩公|供台|傩头用途线索|
+|湖南|傩公傩母|双人画框|成对关系观察|
+|江西|小鬼|戏中酒壶|石邮表演教学路线|
 
-然后打开：
+当前十面具覆盖五个省份，不能误写为十省。道具不是全部传统法器；每件的地方资料、照片来源、署名和教学改编说明见 `map-quest-data.js` 及游戏面具册。小鬼照片与石邮表演的对应未证实，江西站明确标为教学路线。
 
-```text
-http://127.0.0.1:8777/nuo-stickman-mask-game/
-```
+## 文件与接入
 
-## 嵌入方式
+- `map-quest.js`：SVG地图、行走、陆地寻路、省域判定、任务匹配、存档、通关。
+- `map-quest-data.js`：十项任务与来源。
+- `map-quest.css`：沿用原站暖黑、金色、朱红和青色的小人地图风格。
+- `data/china-provinces.geojson`：[DataV省级地理数据](https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json)，2026-10-14获取。34省级区域与附属线划，南海要素以附图展示，游戏图不作测绘用途。
+- 主站 `../index.html#stickman-game`、独立页 `index.html`、接入例 `embed.html` 均加载相同实现。
 
 ```html
-<iframe src="/nuo-stickman-mask-game/index.html" width="100%" height="640" loading="lazy"></iframe>
-```
-
-```html
+<link rel="stylesheet" href="nuo-stickman-mask-game/map-quest.css">
 <div id="nuo-game"></div>
-<script src="/nuo-stickman-mask-game/game.js"></script>
-<script>
-  NuoStickmanGame.mount("#nuo-game", {
-    assetBase: "/nuo-stickman-mask-game/",
-    height: 640,
-    sound: false
-  });
-</script>
+<script src="nuo-stickman-mask-game/map-quest-data.js"></script>
+<script src="nuo-stickman-mask-game/map-quest.js"></script>
+<script>NuoCultureGame.mount('#nuo-game', {assetBase:'nuo-stickman-mask-game/',createHref:'index.html#galaxy'});</script>
 ```
 
-`mount()` 返回对象保留 `restart()`，并提供 `resetLevel()`、`resetAll()`，方便宿主网站接入自定义按钮。可选回调包含 `onScoreChange`、`onGameOver`、`onMaskCollected` 和 `onMechanismSolved`。
+新进度使用 `nuo-map-quest-v1`，按浏览器来源独立存储，只保留十项完成ID与小人位置。原 `nuo-culture-panguan-v1`、`nuo-culture-chapters-v1` 存档不变；旧关卡源码保留作前版参考，不再作为主入口加载。
 
-`game.js` 会自动加载同目录下的 `style.css`、`data/game-data.json` 和 `vendor/three.module.min.js`。面具图片使用本地 SVG 矢量线稿，适合嵌入暗色傩面万象页面。
+## 验证
+
+从仓库根目录执行：
+
+```sh
+node tests/map-quest.test.cjs
+node tests/journey.test.cjs
+python3 tests/site_structure.py
+```
+
+地图测试涵盖洞与多岛、真实省份命中、陆地路线和绕湾、不同面具/道具/省份匹配、重复点燃与异常存档恢复。浏览器另验证十任务通关、刷新恢复、错误道具、手机布局。仅本地更新，未发布线上。

@@ -1,0 +1,101 @@
+/* Four reading levels, using the site's shared spacing and type scale. */
+#color-atlas .ca-layers { display:grid; gap:var(--layout-group-space); margin-top:var(--layout-heading-space); }
+#color-atlas .ca-jump-links { display:flex; flex-wrap:wrap; gap:var(--space-3); }
+#color-atlas .ca-jump-links a { padding:8px 12px; min-height:44px; display:flex; align-items:center; border:1px solid #e5c59036; border-radius:8px; font-size:var(--type-control); color:#e1c68b; text-decoration:none; }
+#color-atlas :is(#caBrowse,#caOverviewTitle,#caRegionTitle,#caSavedTitle) { scroll-margin-top:112px; }
+#color-atlas .ca-layer { min-width:0; padding:var(--layout-card-space); border:1px solid #e5c59026; border-radius:20px; background:#b68b5010; display:grid; gap:var(--space-6); }
+#color-atlas .ca-heading { display:grid; gap:var(--space-2); }
+#color-atlas .ca-heading h3, #color-atlas h4 { margin:0; }
+#color-atlas .ca-heading p { color:#b8ab95; }
+#color-atlas .ca-note, #color-atlas .ca-status, .ca-workshop p { font-size:var(--type-meta); line-height:1.7; color:#b8ab95; }
+#color-atlas .ca-status:empty { display:none; }
+#color-atlas .ca-metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--space-3); }
+#color-atlas .ca-metric { padding:var(--space-4); border-radius:12px; background:#fff2ce06; display:grid; gap:var(--space-1); }
+#color-atlas .ca-metric strong { font:600 28px/1.3 var(--sans); color:#f1dfb9; }
+#color-atlas .ca-metric span { font-size:var(--type-meta); color:#b8ab95; }
+#color-atlas .ca-families { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:var(--space-3); }
+#color-atlas .ca-family { display:grid; gap:var(--space-2); padding:var(--space-3); text-align:left; border:1px solid #e5c59026; border-radius:10px; background:#0e0b08; color:#e5d5b6; }
+#color-atlas .ca-family strong { font:600 20px/1.3 var(--sans); }
+#color-atlas .ca-family small { font-size:var(--type-meta); }
+.ca-bar { height:6px; border-radius:4px; background:#fff2ce12; overflow:hidden; }
+.ca-bar > i { display:block; height:100%; width:var(--share); background:var(--swatch); border-radius:inherit; }
+#color-atlas .ca-controls { display:grid; grid-template-columns:1fr 1fr 1.4fr; align-items:end; gap:var(--space-3); }
+#color-atlas .ca-controls label { display:grid; gap:var(--space-2); font-size:var(--type-meta); color:#b8ab95; min-width:0; }
+#color-atlas .ca-controls :is(input,select) { width:100%; min-width:0; min-height:44px; padding:10px 12px; border:1px solid #e5c59045; border-radius:8px; background:#100c08; color:#f2e2c4; font:400 16px/1.4 var(--sans); }
+#color-atlas .ca-colors { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:var(--space-3); }
+#color-atlas .ca-color { display:grid; gap:var(--space-2); min-width:0; padding:var(--space-2); border:1px solid #e5c59026; border-radius:10px; background:#0e0b08; color:#e5d5b6; text-align:left; font-size:var(--type-meta); }
+#color-atlas .ca-color-chip { display:block; height:48px; border:1px solid #ffffff2b; border-radius:6px; background:var(--swatch); }
+#color-atlas :is(.ca-color,.ca-mask)[aria-pressed=true] { border-color:#e1b970; box-shadow:inset 0 0 0 1px #e1b970; background:#d68d3722; }
+#color-atlas .ca-color span { overflow-wrap:anywhere; }
+.ca-button { min-height:44px; padding:10px 16px; border:1px solid #d4ad695e; border-radius:8px; background:#b17b3420; color:#f0d99f; font:400 var(--type-control)/1.5 var(--sans); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; text-decoration:none; gap:8px; }
+.ca-button:disabled { opacity:.4; cursor:default; }
+.ca-button:focus-visible, #color-atlas button:focus-visible, .ca-workshop button:focus-visible { outline:2px solid #9adbd9; outline-offset:3px; }
+#color-atlas .ca-pagination { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:var(--space-3); font-size:var(--type-meta); color:#b8ab95; }
+#color-atlas .ca-pagination:empty { display:none; }
+#color-atlas .ca-selected-color { display:flex; align-items:center; flex-wrap:wrap; gap:var(--space-4); padding:var(--space-4); background:#0d0a07; border-radius:12px; }
+#color-atlas .ca-selected-color > i { flex:0 0 48px; height:48px; border:1px solid #ffffff40; border-radius:50%; background:var(--swatch); }
+#color-atlas .ca-selected-color > div { flex:1; min-width:140px; }
+#color-atlas .ca-selected-color strong { font-size:var(--type-subtitle); }
+#color-atlas .ca-masks { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--space-3); }
+#color-atlas .ca-mask { display:grid; grid-template-columns:56px minmax(0,1fr); align-items:center; gap:var(--space-3); padding:var(--space-3); border:1px solid #e5c59026; border-radius:10px; background:#0b0806; color:#f0dfbd; text-align:left; }
+#color-atlas .ca-mask img { width:56px; height:72px; object-fit:contain; }
+#color-atlas .ca-mask strong { display:block; font-size:var(--type-control); overflow-wrap:anywhere; }
+#color-atlas .ca-mask small { display:block; color:#aa9d89; font-size:12px; }
+#color-atlas .ca-mask-detail { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr); gap:var(--layout-column-space); padding:var(--layout-card-space); border-radius:14px; background:#070503; }
+#color-atlas .ca-mask-photo { margin:0; min-width:0; display:flex; flex-direction:column; gap:var(--space-2); }
+#color-atlas .ca-mask-photo img { width:100%; height:320px; object-fit:contain; background:#f8f6f0; border-radius:8px; }
+#color-atlas .ca-mask-copy { display:grid; align-content:start; gap:var(--space-4); min-width:0; }
+#color-atlas .ca-mask-copy h4 { font-family:var(--serif); font-size:var(--type-card); }
+#color-atlas .ca-source, .ca-workshop a { color:#d9bd7f; text-decoration:underline; text-underline-offset:4px; overflow-wrap:anywhere; }
+#color-atlas .ca-strip { display:flex; height:24px; overflow:hidden; border-radius:6px; background:#fff2ce08; }
+#color-atlas .ca-strip span { flex:0 0 var(--share); background:var(--swatch); }
+#color-atlas .ca-strip .ca-residual { background:repeating-linear-gradient(135deg,#73654e 0px,#73654e 2px,#302a20 2px,#302a20 6px); }
+#color-atlas .ca-color-rows { display:grid; gap:var(--space-2); }
+#color-atlas .ca-color-row { display:grid; grid-template-columns:24px minmax(0,1fr) auto auto; align-items:center; gap:var(--space-3); font-size:var(--type-meta); }
+#color-atlas .ca-mini-chip { width:24px; height:24px; border-radius:50%; border:1px solid #ffffff38; background:var(--swatch); }
+#color-atlas .ca-color-row .ca-button { padding:8px 12px; }
+#color-atlas .ca-method { color:#b8ab95; font-size:var(--type-meta); }
+#color-atlas .ca-method summary { cursor:pointer; color:#dfc68e; min-height:32px; }
+#color-atlas .ca-method > div { margin-top:var(--space-3); display:grid; gap:var(--space-3); }
+#color-atlas .ca-method p { font-size:var(--type-meta); }
+#color-atlas .ca-region-controls { grid-template-columns:repeat(2,minmax(0,1fr)); }
+#color-atlas .ca-region-facts { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-4); }
+#color-atlas .ca-region-facts div { padding:var(--space-4); background:#fff2ce06; border-radius:10px; }
+#color-atlas .ca-region-facts strong { display:block; color:#ecd8ad; }
+#color-atlas .ca-region-comparison { display:grid; gap:var(--space-4); }
+#color-atlas .ca-compare-row { display:grid; grid-template-columns:80px minmax(0,1fr) minmax(0,1fr); gap:var(--space-4); align-items:center; font-size:var(--type-meta); }
+#color-atlas .ca-compare-row > div { display:grid; gap:var(--space-1); }
+#color-atlas .ca-saved-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--space-3); }
+#color-atlas .ca-saved-item { min-width:0; padding:var(--space-3); border-radius:10px; background:#0c0906; display:grid; gap:var(--space-2); }
+#color-atlas .ca-saved-item > i { height:48px; border:1px solid #ffffff30; border-radius:6px; background:var(--swatch); }
+#color-atlas .ca-saved-item strong { font-size:var(--type-control); }
+#color-atlas .ca-saved-item details { font-size:var(--type-meta); overflow-wrap:anywhere; }
+#color-atlas .ca-saved-item ul { margin:8px 0; padding-left:16px; }
+#color-atlas .ca-saved-actions { margin-top:var(--space-4); }
+.ca-workshop { margin-top:var(--space-3); display:grid; gap:var(--space-2); }
+.ca-workshop-header { display:flex; justify-content:space-between; gap:var(--space-2); font-size:var(--type-meta); }
+.ca-workshop-colors { display:flex; flex-wrap:wrap; gap:var(--space-2); }
+.ca-workshop-colors button { width:44px; height:44px; padding:4px; border:1px solid #d4ad695e; border-radius:50%; background:#100c08; }
+.ca-workshop-colors i { display:block; width:100%; height:100%; border:1px solid #ffffff30; border-radius:50%; background:var(--swatch); }
+.ca-workshop-colors button[aria-pressed=true] { outline:2px solid #e1b970; outline-offset:2px; }
+#color-atlas [hidden], .ca-workshop[hidden] { display:none !important; }
+@media(max-width:760px) {
+  #color-atlas .ca-colors { grid-template-columns:repeat(4,minmax(0,1fr)); }
+  #color-atlas .ca-metrics, #color-atlas .ca-masks, #color-atlas .ca-saved-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #color-atlas .ca-families { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #color-atlas .ca-controls { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #color-atlas .ca-controls > :last-child:nth-child(3) { grid-column:1 / -1; }
+  #color-atlas .ca-mask-detail { grid-template-columns:1fr; }
+  #color-atlas .ca-mask-photo img { height:260px; }
+  #color-atlas .ca-mask { grid-template-columns:1fr; gap:var(--space-2); }
+  #color-atlas .ca-mask img { justify-self:center; height:64px; }
+  #color-atlas .ca-color-chip { height:40px; }
+  #color-atlas .ca-compare-row { grid-template-columns:56px minmax(0,1fr) minmax(0,1fr); gap:var(--space-3); }
+  #color-atlas .ca-color-row { gap:var(--space-2); }
+  #color-atlas .ca-color-row .ca-button { padding-inline:8px; }
+  #color-atlas .ca-layer { gap:var(--space-4); border-radius:16px; }
+}
+
+#color-atlas .ca-color-info { display:grid; gap:4px; }
+#color-atlas .ca-color-hex { white-space:nowrap; font-size:11px; }
+@media(max-width:400px) { #color-atlas .ca-colors { grid-template-columns:repeat(3,minmax(0,1fr)); } }

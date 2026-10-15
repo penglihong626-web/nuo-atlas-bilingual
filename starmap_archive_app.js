@@ -1,5 +1,7 @@
 (function () {
+  function initializeArchive() {
   const atlas = window.NUO_MASK_ATLAS;
+  const t = (value, vars) => window.NuoI18n?.t(value, vars) ?? String(value).replace(/\{(\w+)\}/g, (_, key) => vars?.[key] ?? "");
   const state = {
     layout: "Region",
     search: "",
@@ -76,7 +78,37 @@
   };
 
   const ctx = els.canvas.getContext("2d");
+  const detailActions = document.createElement("div");
+  detailActions.className = "detail-reference-actions";
+  const sourceLink = document.createElement("a");
+  sourceLink.className = "detail-source-link";
+  sourceLink.textContent = "查看原始资料 ↗︎";
+  sourceLink.target = "_blank";
+  sourceLink.rel = "noopener noreferrer";
+  const addReference = document.createElement("button");
+  addReference.className = "chip detail-add-reference";
+  addReference.type = "button";
+  addReference.textContent = "加入创作参考";
+  addReference.addEventListener("click", () => {
+    if (state.selectedId == null) return;
+    window.dispatchEvent(new CustomEvent("nuo:add-reference", {
+      detail: { id: state.selectedId },
+    }));
+  });
+  const viewReferences = document.createElement("a");
+  viewReferences.className = "detail-source-link";
+  viewReferences.href = "#journey-references";
+  viewReferences.textContent = "查看我的参考";
+  const sourceNote = document.createElement("p");
+  sourceNote.className = "detail-source-note";
+  sourceNote.textContent = "视觉特征为本项目图像观察；地域推定以档案标注为准。语义标签是对角色分类的项目解释，尚未形成独立的语义标注。";
+  detailActions.append(sourceLink, addReference, viewReferences, sourceNote);
+  els.detailKeywords.closest(".detail-copy").appendChild(detailActions);
   const imageCache = new Map();
+  const imageQueue = [];
+  const starSprites = new Map();
+  const positionCache = new Map();
+  let imagesLoading = 0;
   let visibleNodes = [];
   let screenNodes = [];
   let imageNodeIds = new Set();
@@ -84,9 +116,29 @@
   let width = 0;
   let height = 0;
   let pixelRatio = 1;
-  let pointerDown = null;
+  const pointers = new Map();
+  let gesture = null;
   let hoveredNode = null;
-  let sceneActive = true;
+  let sceneActive = !("IntersectionObserver" in window);
+  let frameId = 0;
+  let needsDraw = true;
+  let lastAnimationTime = 0;
+  let rotation = { cx: 1, sx: 0, cy: 1, sy: 0 };
+
+  function isActive() {
+    return sceneActive && !document.hidden;
+  }
+
+  function requestDraw() {
+    needsDraw = true;
+    if (isActive() && !frameId) frameId = requestAnimationFrame(animationLoop);
+  }
+
+  function stopAnimation() {
+    if (frameId) cancelAnimationFrame(frameId);
+    frameId = 0;
+    lastAnimationTime = 0;
+  }
 
   function trimText(value, length = 90) {
     const text = String(value || "").trim();
@@ -128,6 +180,7 @@
         node.idText,
         node.name,
         node.region,
+        node.province,
         node.roleType,
         node.faceShape,
         node.semantic,
@@ -135,6 +188,7 @@
         node.feature,
         node.colorDescription,
       ]
+        .flatMap(value => [value, t(value)])
         .join(" ")
         .toLowerCase()
         .includes(query);
@@ -142,20 +196,21 @@
   }
 
   function basePosition(node, layout = state.layout) {
+    const key = `${layout}-${node.id}`;
+    if (positionCache.has(key)) return positionCache.get(key);
     const config = layoutMap[layout];
     const x = Number(node[config.x] || 0) * 420;
     const y = Number(node[config.y] || 0) * 420;
     const planar = Math.min(1.1, Math.hypot(x, y) / 420);
     const depthSeed = hashValue(`${node.id}-${layout}-${node.roleType}-${node.semantic}`);
     const z = (depthSeed - 0.5) * 420 + (0.5 - planar) * 140;
-    return { x, y, z };
+    const position = { x, y, z };
+    positionCache.set(key, position);
+    return position;
   }
 
   function rotatePoint(point) {
-    const cx = Math.cos(state.rotationX);
-    const sx = Math.sin(state.rotationX);
-    const cy = Math.cos(state.rotationY);
-    const sy = Math.sin(state.rotationY);
+    const { cx, sx, cy, sy } = rotation;
 
     const x1 = point.x * cy + point.z * sy;
     const z1 = -point.x * sy + point.z * cy;
@@ -178,23 +233,66 @@
   }
 
   function loadImage(node) {
-    if (imageCache.has(node.image)) return imageCache.get(node.image);
-    const image = new Image();
-    image.onload = drawScene;
-    image.src = node.image;
-    imageCache.set(node.image, image);
-    return image;
+    if (imageCache.has(node.image)) {
+      const entry = imageCache.get(node.image);
+      imageCache.delete(node.image);
+      imageCache.set(node.image, entry);
+      return entry.bitmap;
+    }
+    imageCache.set(node.image, { bitmap: null, pending: true });
+    imageQueue.push(node);
+    return null;
+  }
+
+  function loadQueuedImages() {
+    // Decode only two SVGs at once; the scene keeps small raster thumbnails, not full SVG surfaces.
+    while (isActive() && imagesLoading < 2 && imageQueue.length) {
+      const node = imageQueue.shift();
+      if (!imageNodeIds.has(node.id) || !state.showImages) {
+        imageCache.delete(node.image);
+        continue;
+      }
+      const entry = imageCache.get(node.image);
+      const image = new Image();
+      imagesLoading++;
+      const complete = () => {
+        imagesLoading--;
+        entry.pending = false;
+        while (imageCache.size > (width < 600 ? 96 : 128)) {
+          const removable = [...imageCache].find(([, value]) => !value.pending);
+          if (!removable) break;
+          imageCache.delete(removable[0]);
+        }
+        requestDraw();
+        loadQueuedImages();
+      };
+      image.onload = () => {
+        const thumbnail = document.createElement("canvas");
+        thumbnail.width = thumbnail.height = 160;
+        thumbnail.getContext("2d").drawImage(image, 0, 0, 160, 160);
+        entry.bitmap = thumbnail;
+        complete();
+      };
+      image.onerror = complete;
+      image.decoding = "async";
+      image.src = node.image;
+    }
   }
 
   function resizeCanvas() {
     const rect = els.canvas.getBoundingClientRect();
-    pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-    width = Math.max(320, Math.floor(rect.width));
-    height = Math.max(320, Math.floor(rect.height));
+    if (!rect.width || !rect.height) return;
+    const nextRatio = Math.min(window.devicePixelRatio || 1, 2);
+    const nextWidth = Math.max(320, Math.floor(rect.width));
+    const nextHeight = Math.max(320, Math.floor(rect.height));
+    if (width === nextWidth && height === nextHeight && pixelRatio === nextRatio) return;
+    pixelRatio = nextRatio;
+    width = nextWidth;
+    height = nextHeight;
     els.canvas.width = Math.floor(width * pixelRatio);
     els.canvas.height = Math.floor(height * pixelRatio);
     ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    drawScene();
+    requestDraw();
   }
 
   function drawPath(points, strokeStyle, lineWidth = 1) {
@@ -229,12 +327,15 @@
     return points;
   }
 
+  const gridCircles = [150, 285, 420, 540].map(radius =>
+    ["xy", "xz", "yz"].map(axis => circlePoints(axis, radius)));
+
   function drawGrid() {
-    [150, 285, 420, 540].forEach((radius, index) => {
+    gridCircles.forEach(([xy, xz, yz], index) => {
       const alpha = index === 3 ? 0.24 : 0.13;
-      drawPath(circlePoints("xy", radius), `rgba(255, 228, 163, ${alpha})`, 1);
-      drawPath(circlePoints("xz", radius), `rgba(255, 240, 210, ${alpha * 0.52})`, 1);
-      drawPath(circlePoints("yz", radius), `rgba(144, 223, 225, ${alpha * 0.48})`, 1);
+      drawPath(xy, `rgba(255, 228, 163, ${alpha})`, 1);
+      drawPath(xz, `rgba(255, 240, 210, ${alpha * 0.52})`, 1);
+      drawPath(yz, `rgba(144, 223, 225, ${alpha * 0.48})`, 1);
     });
 
     for (let i = 0; i < 24; i += 1) {
@@ -290,8 +391,30 @@
         const size = (isCase ? 15 : 9) * projected.scale;
         return { node, base, ...projected, isCase, hitRadius: Math.max(8, size + 6) };
       })
-      .filter((item) => item.visible)
+      .filter((item) => item.visible && item.x > -100 && item.x < width + 100 && item.y > -100 && item.y < height + 100)
       .sort((a, b) => a.z - b.z);
+  }
+
+  function starSprite(color, isCase, selected) {
+    const key = `${color}-${isCase}-${selected}`;
+    if (starSprites.has(key)) return starSprites.get(key);
+    const sprite = document.createElement("canvas");
+    sprite.width = sprite.height = 128;
+    const paint = sprite.getContext("2d");
+    const glow = paint.createRadialGradient(64, 64, 0, 64, 64, 60);
+    glow.addColorStop(0, colorWithAlpha(color, selected ? 0.72 : 0.45));
+    glow.addColorStop(1, colorWithAlpha(color, 0));
+    paint.fillStyle = glow;
+    paint.fillRect(0, 0, 128, 128);
+    paint.fillStyle = color;
+    paint.strokeStyle = selected ? "#ffe4a3" : "rgba(255,240,210,0.72)";
+    paint.lineWidth = selected ? 3 : 1.5;
+    paint.beginPath();
+    paint.arc(64, 64, 60 * (isCase ? 5.8 / 24 : 3.9 / 15) / 2.1, 0, Math.PI * 2);
+    paint.fill();
+    paint.stroke();
+    starSprites.set(key, sprite);
+    return sprite;
   }
 
   function drawNode(item) {
@@ -302,39 +425,22 @@
     const dotSize = (isCase ? 5.8 : 3.9) * scale;
     const isSelected = node.id === state.selectedId;
 
-    const gradient = ctx.createRadialGradient(x, y, 0, x, y, glowSize * 2.1);
-    gradient.addColorStop(0, colorWithAlpha(color, isSelected ? 0.72 : 0.45 * depthAlpha));
-    gradient.addColorStop(1, colorWithAlpha(color, 0));
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(x, y, glowSize * 2.1, 0, Math.PI * 2);
-    ctx.fill();
+    const spriteSize = glowSize * 2.1 * 128 / 60;
+    ctx.save();
+    ctx.globalAlpha = depthAlpha;
+    ctx.drawImage(starSprite(color, isCase, isSelected), x - spriteSize / 2, y - spriteSize / 2, spriteSize, spriteSize);
+    ctx.restore();
 
     if (state.showImages && imageNodeIds.has(node.id)) {
       const image = loadImage(node);
-      if (image.complete && image.naturalWidth) {
+      if (image) {
         const imageSize = (isCase ? 31 : 22) * scale;
         ctx.save();
         ctx.globalAlpha = Math.max(0.26, depthAlpha);
-        ctx.shadowColor = colorWithAlpha("#ffffff", 0.36);
-        ctx.shadowBlur = 7 * scale;
         ctx.drawImage(image, x - imageSize / 2, y - imageSize - dotSize - 5 * scale, imageSize, imageSize);
         ctx.restore();
       }
     }
-
-    ctx.save();
-    ctx.globalAlpha = depthAlpha;
-    ctx.fillStyle = color;
-    ctx.shadowColor = colorWithAlpha(color, 0.78);
-    ctx.shadowBlur = isSelected ? 18 : 10;
-    ctx.beginPath();
-    ctx.arc(x, y, dotSize, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = isSelected ? "#ffe4a3" : "rgba(255,240,210,0.72)";
-    ctx.lineWidth = isSelected ? 2.2 : 0.9;
-    ctx.stroke();
-    ctx.restore();
 
     if (isSelected) {
       ctx.save();
@@ -386,7 +492,7 @@
 
   function drawLabels() {
     ctx.save();
-    ctx.font = '12px "Space Mono", "Microsoft YaHei", monospace';
+    ctx.font = '400 13px "Nuo Sans", "PingFang SC", sans-serif';
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     labels.forEach((item) => {
@@ -396,14 +502,15 @@
       ctx.fillStyle = `rgba(255, 240, 210, ${alpha})`;
       ctx.strokeStyle = "rgba(7, 4, 3, 0.88)";
       ctx.lineWidth = 4;
-      ctx.strokeText(item.label, projected.x, projected.y);
-      ctx.fillText(item.label, projected.x, projected.y);
+      ctx.strokeText(t(item.label), projected.x, projected.y);
+      ctx.fillText(t(item.label), projected.x, projected.y);
     });
     ctx.restore();
   }
 
   function drawScene() {
     if (!ctx || !width || !height) return;
+    rotation = { cx: Math.cos(state.rotationX), sx: Math.sin(state.rotationX), cy: Math.cos(state.rotationY), sy: Math.sin(state.rotationY) };
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = "#050302";
     ctx.fillRect(0, 0, width, height);
@@ -418,19 +525,27 @@
     drawGrid();
     drawLinks();
     buildScreenNodes();
-    imageNodeIds = new Set(screenNodes.slice(-90).map((item) => item.node.id));
+    imageNodeIds = new Set(screenNodes.slice(width < 600 ? -36 : -90).map((item) => item.node.id));
     atlas.meta.caseIds.forEach((id) => imageNodeIds.add(id));
     if (state.selectedId) imageNodeIds.add(state.selectedId);
     screenNodes.forEach(drawNode);
     drawLabels();
+    loadQueuedImages();
   }
 
-  function animationLoop() {
-    if (sceneActive && state.autoRotate && !pointerDown) {
-      state.rotationY += 0.0022;
-      drawScene();
+  function animationLoop(time) {
+    frameId = 0;
+    if (!isActive()) return;
+    const rotating = state.autoRotate && !pointers.size;
+    const elapsed = lastAnimationTime ? time - lastAnimationTime : 0;
+    const animate = rotating && (!lastAnimationTime || elapsed >= (width < 600 ? 32 : 16));
+    if (animate) {
+      state.rotationY += Math.min(elapsed, 64) * 0.000132;
+      lastAnimationTime = time;
     }
-    requestAnimationFrame(animationLoop);
+    if (needsDraw || animate) { needsDraw = false; drawScene(); }
+    if (rotating) frameId = requestAnimationFrame(animationLoop);
+    else lastAnimationTime = 0;
   }
 
   function renderLegend() {
@@ -536,9 +651,24 @@
       span.textContent = tag;
       els.detailTags.appendChild(span);
     });
-    els.detailFeature.textContent = trimText(node.feature, 168) || "暂无特征描述";
-    els.detailColor.textContent = trimText(node.colorDescription, 128) || "暂无色彩描述";
+    els.detailFeature.textContent = t(node.feature) || t("暂无特征描述");
+    els.detailColor.textContent = t(node.colorDescription) || t("暂无色彩描述");
     els.detailKeywords.textContent = node.keywords || "暂无关键词";
+    sourceLink.removeAttribute("href");
+    sourceLink.hidden = true;
+    try {
+      const source = new URL(node.detailUrl);
+      if (source.protocol === "https:" || source.protocol === "http:") {
+        sourceLink.href = source.href;
+        sourceLink.hidden = false;
+      }
+    } catch (_) {
+      // Keep absent or invalid archive URLs out of the clickable source link.
+    }
+    addReference.dataset.referenceId = node.id;
+    const isReference = Boolean(window.NuoJourney?.hasReference(node.id));
+    addReference.textContent = isReference ? "已加入我的参考 ✓" : "加入创作参考";
+    addReference.setAttribute("aria-label", t(isReference ? "{name}已加入我的参考" : "将{name}加入创作参考", {name:t(node.name || node.idText)}));
   }
 
   function updateStats() {
@@ -555,8 +685,13 @@
     updateStats();
     rebuildLabels();
     renderCaseStrip();
-    drawScene();
+    requestDraw();
   }
+
+  window.addEventListener("nuo:language-change", () => {
+    if (state.selectedId != null) selectNode(state.selectedId);
+    render();
+  });
 
   function hitTest(clientX, clientY) {
     const rect = els.canvas.getBoundingClientRect();
@@ -575,7 +710,7 @@
       <strong>${node.name || node.idText}</strong>
       <span>${node.idText} / ${node.region}</span>
       <span>${node.roleType} / ${node.faceShape || "未标注"}</span>
-      <span>${trimText(node.keywords || node.semantic, 46)}</span>
+      <span>${trimText(t(node.keywords || node.semantic), 160)}</span>
     `;
     positionTooltip(event);
   }
@@ -590,6 +725,40 @@
 
   function hideTooltip() {
     els.tooltip.hidden = true;
+  }
+
+  function beginGesture() {
+    const [first, second] = pointers.values();
+    gesture = first ? {
+      x: first.x, y: first.y,
+      rotationX: state.rotationX, rotationY: state.rotationY,
+      distance: second ? Math.hypot(second.x - first.x, second.y - first.y) : 0,
+      zoom: state.zoom,
+    } : null;
+    els.canvas.classList.toggle("is-dragging", pointers.size > 0);
+  }
+
+  function endPointer(event) {
+    const pointer = pointers.get(event.pointerId);
+    if (!pointer) return;
+    const rect = els.canvas.getBoundingClientRect();
+    const wasClick = event.type === "pointerup" && pointer.canTap && !pointer.moved &&
+      Math.hypot(event.clientX - pointer.startX, event.clientY - pointer.startY) <= 6 &&
+      event.clientX >= rect.left && event.clientX <= rect.right &&
+      event.clientY >= rect.top && event.clientY <= rect.bottom;
+    pointers.delete(event.pointerId);
+    // Rebase the remaining finger after a pinch; lifting a finger never becomes a tap.
+    pointers.forEach(point => { point.canTap = false; });
+    beginGesture();
+    if (els.canvas.hasPointerCapture(event.pointerId)) els.canvas.releasePointerCapture(event.pointerId);
+    if (wasClick) {
+      const node = hitTest(event.clientX, event.clientY);
+      if (node) {
+        selectNode(node.id);
+        render();
+      }
+    }
+    requestDraw();
   }
 
   function bindEvents() {
@@ -616,61 +785,73 @@
     els.toggleImages.addEventListener("click", () => {
       state.showImages = !state.showImages;
       els.toggleImages.classList.toggle("is-on", state.showImages);
-      drawScene();
+      requestDraw();
     });
 
     els.toggleLinks.addEventListener("click", () => {
       state.showLinks = !state.showLinks;
       els.toggleLinks.classList.toggle("is-on", state.showLinks);
-      drawScene();
+      requestDraw();
     });
 
     els.toggleRotate.addEventListener("click", () => {
       state.autoRotate = !state.autoRotate;
       els.toggleRotate.classList.toggle("is-on", state.autoRotate);
+      requestDraw();
     });
 
     els.resetView.addEventListener("click", () => {
       state.rotationX = -0.48;
       state.rotationY = 0.72;
       state.zoom = 1;
-      drawScene();
+      requestDraw();
     });
 
     els.canvas.addEventListener(
       "wheel",
       (event) => {
+        // Keep browser / trackpad page zoom available; only ordinary wheel input zooms the atlas.
+        if (event.ctrlKey || event.metaKey || !event.deltaY) return;
         event.preventDefault();
         const nextZoom = state.zoom * (event.deltaY > 0 ? 0.92 : 1.08);
         state.zoom = Math.min(2.25, Math.max(0.55, nextZoom));
-        drawScene();
+        requestDraw();
       },
       { passive: false },
     );
 
     els.canvas.addEventListener("pointerdown", (event) => {
-      pointerDown = {
-        x: event.clientX,
-        y: event.clientY,
-        rotationX: state.rotationX,
-        rotationY: state.rotationY,
-        moved: false,
-      };
-      els.canvas.classList.add("is-dragging");
+      if (event.button !== 0) return;
+      pointers.set(event.pointerId, {
+        x: event.clientX, y: event.clientY,
+        startX: event.clientX, startY: event.clientY,
+        canTap: pointers.size === 0, moved: false,
+      });
+      if (pointers.size > 1) pointers.forEach(point => { point.canTap = false; });
+      beginGesture();
+      hideTooltip();
       els.canvas.setPointerCapture(event.pointerId);
     });
 
     els.canvas.addEventListener("pointermove", (event) => {
-      if (pointerDown) {
-        const dx = event.clientX - pointerDown.x;
-        const dy = event.clientY - pointerDown.y;
-        if (Math.hypot(dx, dy) > 3) pointerDown.moved = true;
-        state.rotationY = pointerDown.rotationY + dx * 0.008;
-        state.rotationX = Math.max(-1.35, Math.min(1.35, pointerDown.rotationX + dy * 0.008));
-        drawScene();
+      const pointer = pointers.get(event.pointerId);
+      if (pointer) {
+        pointer.x = event.clientX;
+        pointer.y = event.clientY;
+        if (Math.hypot(pointer.x - pointer.startX, pointer.y - pointer.startY) > 6) pointer.moved = true;
+        const [first, second] = pointers.values();
+        if (second) {
+          const distance = Math.hypot(second.x - first.x, second.y - first.y);
+          if (gesture.distance > 0) state.zoom = Math.min(2.25, Math.max(0.55, gesture.zoom * distance / gesture.distance));
+        } else {
+          state.rotationY = gesture.rotationY + (pointer.x - gesture.x) * 0.008;
+          state.rotationX = Math.max(-1.35, Math.min(1.35, gesture.rotationX + (pointer.y - gesture.y) * 0.008));
+        }
+        requestDraw();
         hideTooltip();
         return;
       }
+      if (pointers.size || event.pointerType === "touch") return;
 
       const node = hitTest(event.clientX, event.clientY);
       hoveredNode = node;
@@ -679,32 +860,26 @@
       else hideTooltip();
     });
 
-    els.canvas.addEventListener("pointerup", (event) => {
-      const wasClick = pointerDown && !pointerDown.moved;
-      if (wasClick) {
-        const node = hitTest(event.clientX, event.clientY);
-        if (node) {
-          selectNode(node.id);
-          render();
-        }
-      }
-      pointerDown = null;
-      els.canvas.classList.remove("is-dragging");
-      if (els.canvas.hasPointerCapture(event.pointerId)) els.canvas.releasePointerCapture(event.pointerId);
-    });
+    ["pointerup", "pointercancel", "lostpointercapture"].forEach(type => els.canvas.addEventListener(type, endPointer));
 
     els.canvas.addEventListener("pointerleave", () => {
-      pointerDown = null;
       hoveredNode = null;
-      els.canvas.classList.remove("is-dragging");
       hideTooltip();
     });
 
     window.addEventListener("resize", resizeCanvas);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) stopAnimation();
+      else requestDraw();
+    });
     if ("IntersectionObserver" in window) {
       const observer = new IntersectionObserver(([entry]) => {
         sceneActive = entry.isIntersecting;
-        if (sceneActive) drawScene();
+        if (sceneActive) {
+          resizeCanvas();
+          requestDraw();
+        }
+        else stopAnimation();
       }, { threshold: 0.08 });
       observer.observe(els.canvas);
     }
@@ -729,8 +904,20 @@
     visibleNodes = filteredNodes();
     resizeCanvas();
     render();
-    requestAnimationFrame(animationLoop);
+    document.fonts?.ready.then(requestDraw);
   }
 
   init();
+  }
+
+  const chart = document.getElementById("starChart");
+  if (!chart) return;
+  if ("IntersectionObserver" in window) {
+    const preloadObserver = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      preloadObserver.disconnect();
+      initializeArchive();
+    }, { rootMargin: "240px 0px" });
+    preloadObserver.observe(chart);
+  } else initializeArchive();
 })();

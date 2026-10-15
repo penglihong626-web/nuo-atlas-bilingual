@@ -1,0 +1,213 @@
+/* One type scale for the current locale, shared by the journey and the atlas.
+   Font files are served locally by fonts.css; components own layout, not headings. */
+:root {
+  --type-hero: clamp(64px, 6.7vw, 96px);
+  --type-section: 40px;
+  --type-card: 24px;
+  --type-subtitle: 18px;
+  --type-body: 16px;
+  --type-control: 14px;
+  --type-meta: 13px;
+  --display-weight: 700;
+  --display-tracking: .06em;
+  --display-fill: linear-gradient(105deg, #f2d99f 0%, #e9b57e 30%, #eb784d 64%, #ff6034 100%);
+  --display-relief: drop-shadow(.012em .012em 0 #bd8751)
+    drop-shadow(.016em .016em 0 #78402b)
+    drop-shadow(.012em .016em 0 #44251c);
+}
+
+body.journey-site {
+  font: 400 var(--type-body)/1.8 var(--sans);
+  font-synthesis: none;
+  letter-spacing: normal;
+}
+
+body.journey-site p {
+  font-family: var(--sans);
+  font-size: var(--type-body);
+  line-height: 1.8;
+}
+
+body.journey-site :is(h1, h2, h3, h4):not(:where(.nuo-game-widget *)) {
+  line-height: 1.4;
+  letter-spacing: .02em;
+  font-weight: 600;
+  text-shadow: none;
+  overflow-wrap: break-word;
+}
+
+/* Every main-route and atlas chapter heading has the same complete treatment.
+   Keep the relief smaller than the letter gap, including on narrow screens. */
+body.journey-site h2.section-title {
+  font-family: var(--serif);
+  font-size: var(--type-section);
+  font-weight: var(--display-weight);
+  line-height: 1.45;
+  letter-spacing: var(--display-tracking);
+  text-wrap: balance;
+  color: #edbb80;
+  background: var(--display-fill);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: var(--display-relief);
+}
+
+body.journey-site h3:not(:where(.nuo-game-widget *)) {
+  font-family: var(--serif);
+  font-size: var(--type-card);
+}
+
+body.journey-site h4:not(:where(.nuo-game-widget *)) {
+  font-family: var(--sans);
+  font-size: var(--type-subtitle);
+}
+
+/* Explanatory sidebars and selected records sit below chart titles in the atlas. */
+body.journey-site #research-library :is(.insight-control-card, .insight-detail,
+  .color-atlas-panel, .color-selected-card, .color-region-detail, .color-mask-detail,
+  .archive-detail, .deck-control) h3 {
+  font-family: var(--sans);
+  font-size: 20px;
+  line-height: 1.5;
+  letter-spacing: normal;
+}
+
+body.journey-site .hero-title {
+  font: var(--display-weight) var(--type-hero)/1.3 var(--serif);
+  letter-spacing: .08em;
+  filter: none;
+  animation: none;
+  will-change: auto;
+}
+
+body.journey-site .hero-title::after { content: none; }
+body.journey-site .hero-title .line {
+  transform: none;
+  text-shadow: none;
+  background: var(--display-fill);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: var(--display-relief);
+  -webkit-text-stroke: 0;
+}
+body.journey-site .hero-promise {
+  font: 400 28px/1.6 var(--serif);
+  letter-spacing: .02em;
+}
+
+body.journey-site .hero-sub {
+  font: 400 var(--type-body)/1.9 var(--sans);
+  text-align: left;
+  color: #e0d0b5;
+}
+
+body.journey-site :is(.section-desc, .journey-heading > p:last-child,
+  .intro-copy p, .sample-copy p, .region-overview, .region-context p,
+  .region-sample-body p, .intention-prompts p, .workshop-context p,
+  .workshop-reference p, .workshop-guide p, .workshop-guide li,
+  .finished-card .card-explanation, .result-actions > p:not(.field-note),
+  .period-card p, .feature > span, .detail-list dd,
+  .insight-control-card p, .insight-detail p, .quadrant-card p,
+  .color-atlas-panel p, .color-region-panel > p:not(.color-scroll-hint),
+  .color-mask-panel > p:not(.color-scroll-hint), .color-region-detail p,
+  .color-mask-detail p, .color-selected-card p, .culture-guide > p:not(.eyebrow)) {
+  font: 400 var(--type-body)/1.8 var(--sans);
+  letter-spacing: normal;
+}
+
+/* Metadata is secondary in size, not a separate language or typeface. */
+body.journey-site :is(.kicker, .eyebrow, .index, small, .field-note, .research-note,
+  .sample-copy .sample-meta, .sample-image p, .source-links a, .detail-source-link,
+  .region-tradition .region-place, .region-context .region-boundary,
+  .region-sample-note, .region-result-count, .region-sample-body .region-archive-note,
+  .reference-row p, .workshop-reference .workshop-note,
+  .finished-card .card-meta, .card-sources p, .card-sources a,
+  .example-work .example-note, .example-work span, .saved-work p,
+  .sample-comparison figcaption, .detail-source-note, .journey-status) {
+  font: 400 var(--type-meta)/1.75 var(--sans);
+  letter-spacing: normal;
+  text-transform: none;
+}
+body.journey-site :is(.kicker, .eyebrow, .index) {
+  letter-spacing: .06em;
+  color: var(--gold-hot);
+  text-shadow: none;
+}
+body.journey-site .section-meta .kicker { text-align: left; }
+
+body.journey-site :is(.nav-links a, .nav-cta, .site-menu summary, .site-menu-links a,
+  .journey-button, .journey-text-link, .reference-row a, .reference-row button,
+  .tool-button, .painting-desk .tool-button, .painting-desk .brush-options > summary,
+  .research-contents a, .sample-sources summary, .workshop-guide summary,
+  .archive-segmented button, .atlas-archive .chip, .atlas-archive .check-item,
+  .quadrant-filter-row button, .region-add, .region-pagination button) {
+  font: 400 var(--type-control)/1.5 var(--sans);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+body.journey-site :is(input:not([type=range]):not([type=radio]):not([type=checkbox]),
+  textarea, select) {
+  font: 400 var(--type-body)/1.5 var(--sans);
+  letter-spacing: normal;
+}
+
+body.journey-site :is(label, legend, .field-label, .detail-list dt,
+  .insight-tab strong, .semantic-row strong, .level-row strong,
+  .color-region-row strong, .color-mask-row strong) {
+  font-family: var(--sans);
+  font-size: var(--type-control);
+  line-height: 1.6;
+  letter-spacing: normal;
+}
+
+body.journey-site :is(.example-work h4, .finished-card h3, .saved-work h3,
+  .sample-copy h3, .region-context h3) {
+  font: 600 var(--type-card)/1.4 var(--serif);
+  letter-spacing: .02em;
+}
+body.journey-site :is(.creation-method strong, .coloring-template strong,
+  .workshop-context strong, .reference-row strong, .feature strong) {
+  font: 600 var(--type-subtitle)/1.5 var(--sans);
+  letter-spacing: normal;
+}
+
+body.journey-site .research-directory-heading h3 {
+  font: 600 var(--type-card)/1.5 var(--serif);
+}
+body.journey-site .finished-card .card-wish {
+  font: 400 var(--type-subtitle)/1.8 var(--serif);
+}
+
+/* Values keep their columns without switching to a third, monospaced family. */
+body.journey-site :is(.archive-summary, .insight-metric, .color-atlas-metric,
+  .matrix-cell, .matrix-head, .color-row, .color-data-row, .insight-keyvals,
+  .color-mask-meta, .color-detail-grid, output) { font-variant-numeric: tabular-nums; }
+body.journey-site :is(.archive-summary span, .insight-metric strong,
+  .color-atlas-metric strong, .quadrant-card > strong, .deck-stats strong) {
+  font: 600 28px/1.3 var(--sans);
+  letter-spacing: normal;
+  overflow-wrap: anywhere;
+}
+body.journey-site .matrix-cell b {
+  font: 600 var(--type-body)/1.5 var(--sans);
+  white-space: nowrap;
+}
+body.journey-site .feature-matrix { min-width: 720px; }
+body.journey-site .emotion-scatter text { font-family: var(--sans); font-size: 20px; }
+
+@media (max-width: 900px) {
+  :root { --type-section: 32px; }
+}
+@media (max-width: 600px) {
+  :root {
+    --type-hero: clamp(48px, 13vw, 56px);
+    --type-section: 28px;
+    --type-card: 22px;
+  }
+  body.journey-site .hero-promise { font-size: 24px; }
+  body.journey-site .painting-desk .tool-button { padding-inline: 8px; }
+  body.journey-site .emotion-scatter text { font-size: 28px; }
+}

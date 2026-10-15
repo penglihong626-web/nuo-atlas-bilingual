@@ -1,0 +1,106 @@
+{
+  "checkedOn": "2026-10-04",
+  "scope": "All 483 local SVGs were rasterized and passed through the runtime alpha-to-silhouette fallback. This verifies nonempty geometry input coverage, not the historical accuracy of inferred depth or all-device performance.",
+  "sourceDirectory": "assets/masks",
+  "sourceCount": 483,
+  "resolution": {
+    "width": 270,
+    "height": 300
+  },
+  "sourcePlacement": "Proportional fit within 80% of the 900×1000 paper, centered; matches the default original-outline placement.",
+  "emptyOrInsufficientSilhouettes": [],
+  "frontTriangles": {
+    "min": 11228,
+    "median": 36832,
+    "p90": 48640,
+    "max": 70674
+  },
+  "completeShellTriangles": {
+    "min": 23332,
+    "median": 75108,
+    "p90": 98804,
+    "max": 144088
+  },
+  "manuallyRegisteredSourceIds": [
+    "0317",
+    "0319",
+    "0322",
+    "0324",
+    "0325",
+    "0326"
+  ],
+  "registration": "Original SVG feature positions were visually checked against the six local pilot photographs. Brow/nose/mouth depth remains a contemporary design inference.",
+  "preferredSixSourceSilhouettes": "At runtime, the six original-template silhouettes take priority when present, retaining their reviewed outlines and holes. This broad-coverage report tests the fallback on all 483 sources, including those six.",
+  "unknownSourceBehavior": "Sources without registered landmarks receive only a shallow source-shaped relief; no eyes or noses are invented.",
+  "freeDrawingBehavior": "Works without a base outline or template use a clearly labelled generic blank mask shell.",
+  "unitChecks": "node tests/model-mask.test.cjs checks source notches/ornaments, closed rims, opposite back winding, 0.09 shell thickness, planar proportional UVs, transform registration, depth separation, small-gap closure, and empty-mask rejection.",
+  "limitations": [
+    "Not original-object scans, verified wearable dimensions, or print-ready models.",
+    "Raster-derived source silhouettes approximate fine line gaps and may fill enclosed decorative holes in the fallback path.",
+    "Mobile Safari was not measured on physical hardware by the agent."
+  ],
+  "smallest": [
+    {
+      "source": "0473.svg",
+      "cells": 5614,
+      "frontTriangles": 11228,
+      "totalTriangles": 23332
+    },
+    {
+      "source": "0362.svg",
+      "cells": 7037,
+      "frontTriangles": 14074,
+      "totalTriangles": 28924
+    },
+    {
+      "source": "0469.svg",
+      "cells": 8267,
+      "frontTriangles": 16534,
+      "totalTriangles": 35236
+    },
+    {
+      "source": "0210.svg",
+      "cells": 8714,
+      "frontTriangles": 17428,
+      "totalTriangles": 36276
+    },
+    {
+      "source": "0442.svg",
+      "cells": 9249,
+      "frontTriangles": 18498,
+      "totalTriangles": 39144
+    }
+  ],
+  "largest": [
+    {
+      "source": "0436.svg",
+      "cells": 35337,
+      "frontTriangles": 70674,
+      "totalTriangles": 144088
+    },
+    {
+      "source": "0343.svg",
+      "cells": 33323,
+      "frontTriangles": 66646,
+      "totalTriangles": 134916
+    },
+    {
+      "source": "0400.svg",
+      "cells": 30206,
+      "frontTriangles": 60412,
+      "totalTriangles": 122592
+    },
+    {
+      "source": "0428.svg",
+      "cells": 29812,
+      "frontTriangles": 59624,
+      "totalTriangles": 121056
+    },
+    {
+      "source": "0341.svg",
+      "cells": 29428,
+      "frontTriangles": 58856,
+      "totalTriangles": 119844
+    }
+  ]
+}

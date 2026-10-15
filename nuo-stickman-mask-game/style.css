@@ -38,22 +38,26 @@
   --green: #adca7a;
   --line: rgba(255, 240, 210, 0.14);
   --line-strong: rgba(255, 240, 210, 0.28);
-  --serif: "Noto Serif SC", "Songti SC", STSong, SimSun, serif;
-  --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   position: relative;
   width: 100%;
   min-height: 560px;
   color: var(--ink);
-  font-family: var(--sans);
+  font-family: var(--sans, "Nuo Sans", sans-serif);
+  font-size: 16px;
+  line-height: 1.8;
   letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
   isolation: isolate;
 }
 
 .nuo-game-widget button {
-  font: inherit;
+  font: 400 14px/1.5 var(--sans, "Nuo Sans", sans-serif);
   letter-spacing: 0;
   color: inherit;
+}
+
+.nuo-game-widget strong {
+  font-weight: 600;
 }
 
 .nuo-game-widget img {
@@ -174,10 +178,10 @@
 .nuo-stat span {
   display: block;
   color: var(--muted);
-  font-family: var(--mono);
-  font-size: 10px;
-  line-height: 1.2;
-  text-transform: uppercase;
+  font-family: var(--sans, "Nuo Sans", sans-serif);
+  font-size: 13px;
+  line-height: 1.5;
+  text-transform: none;
 }
 
 .nuo-stat strong {
@@ -186,9 +190,9 @@
   overflow: hidden;
   margin-top: 3px;
   color: var(--gold-hot);
-  font-family: var(--serif);
+  font-family: var(--sans, "Nuo Sans", sans-serif);
   font-size: 22px;
-  line-height: 1;
+  line-height: 1.3;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -269,26 +273,26 @@
 .nuo-detail-panel small {
   display: block;
   color: var(--gold);
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-family: var(--sans, "Nuo Sans", sans-serif);
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .nuo-overlay-panel h1 {
   margin: 8px 0 0;
   color: var(--red-hot);
-  font-family: var(--serif);
-  font-size: clamp(46px, 8vw, 76px);
-  line-height: 0.96;
-  text-shadow: 0 0 24px rgba(255, 96, 52, 0.34);
+  font-family: var(--serif, "Nuo Serif", serif);
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
 .nuo-overlay-panel p {
   margin: 13px 0 0;
   max-width: 38em;
   color: var(--muted);
-  line-height: 1.7;
+  line-height: 1.8;
 }
 
 .nuo-primary-action {
@@ -337,14 +341,15 @@
 
 .nuo-reward-heading span {
   color: var(--gold);
-  font-family: var(--serif);
+  font-family: var(--sans, "Nuo Sans", sans-serif);
   font-size: 18px;
+  font-weight: 600;
 }
 
 .nuo-reward-heading strong {
   color: var(--muted);
-  font-family: var(--mono);
-  font-size: 11px;
+  font-family: var(--sans, "Nuo Sans", sans-serif);
+  font-size: 13px;
   font-weight: 500;
 }
 
@@ -383,9 +388,9 @@
 .nuo-reward-meta {
   overflow: hidden;
   color: var(--ink);
-  font-family: var(--serif);
+  font-family: var(--sans, "Nuo Sans", sans-serif);
   font-size: 13px;
-  line-height: 1.15;
+  line-height: 1.5;
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -431,28 +436,28 @@
 .nuo-shortcut-panel small {
   display: block;
   color: var(--gold);
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-family: var(--sans, "Nuo Sans", sans-serif);
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .nuo-reset-panel h2,
 .nuo-shortcut-panel h2 {
   margin: 8px 0 0;
   color: var(--red-hot);
-  font-family: var(--serif);
-  font-size: clamp(32px, 6vw, 50px);
-  line-height: 1;
-  text-shadow: 0 0 20px rgba(255, 96, 52, 0.28);
+  font-family: var(--serif, "Nuo Serif", serif);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
 .nuo-reset-panel p,
 .nuo-shortcut-panel p {
   margin: 12px 0 0;
   color: var(--muted);
-  font-size: 14px;
-  line-height: 1.65;
+  font-size: 16px;
+  line-height: 1.8;
 }
 
 .nuo-shortcut-grid {
@@ -473,9 +478,10 @@
 .nuo-shortcut-group h3 {
   margin: 0 0 9px;
   color: var(--gold-hot);
-  font-family: var(--serif);
+  font-family: var(--sans, "Nuo Sans", sans-serif);
   font-size: 18px;
-  line-height: 1;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
 .nuo-shortcut-row {
@@ -500,9 +506,9 @@
   background: rgba(7, 4, 3, 0.74);
   padding: 3px 6px;
   color: var(--ink);
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 700;
+  font-family: var(--sans, "Nuo Sans", sans-serif);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .nuo-reset-actions {
@@ -625,17 +631,17 @@
 
 .nuo-touch-jump {
   color: var(--gold-hot);
-  font-family: var(--serif);
+  font-family: var(--sans, "Nuo Sans", sans-serif);
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 600;
   text-align: center;
 }
 
 .nuo-touch-activate {
   color: var(--gold-hot);
-  font-family: var(--serif);
+  font-family: var(--sans, "Nuo Sans", sans-serif);
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 600;
   text-align: center;
 }
 
@@ -685,15 +691,16 @@
 .nuo-gallery-title h2 {
   margin: 0;
   color: var(--ink);
-  font-family: var(--serif);
-  font-size: 30px;
-  line-height: 1;
+  font-family: var(--serif, "Nuo Serif", serif);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
 .nuo-gallery-count {
   color: var(--gold);
-  font-family: var(--mono);
-  font-size: 12px;
+  font-family: var(--sans, "Nuo Sans", sans-serif);
+  font-size: 13px;
 }
 
 .nuo-gallery-tabs {
@@ -726,16 +733,16 @@
 
 .nuo-level-dot b {
   color: var(--muted);
-  font-family: var(--serif);
+  font-family: var(--sans, "Nuo Sans", sans-serif);
   font-size: 13px;
-  line-height: 1.15;
+  line-height: 1.5;
 }
 
 .nuo-level-dot em {
   margin-top: 2px;
   color: var(--faint);
-  font-family: var(--mono);
-  font-size: 11px;
+  font-family: var(--sans, "Nuo Sans", sans-serif);
+  font-size: 13px;
   font-style: normal;
 }
 
@@ -872,15 +879,15 @@
 
 .nuo-mask-label strong {
   color: var(--ink);
-  font-family: var(--serif);
+  font-family: var(--sans, "Nuo Sans", sans-serif);
   font-size: 14px;
-  line-height: 1.2;
+  line-height: 1.5;
 }
 
 .nuo-mask-label span {
   color: var(--muted);
-  font-size: 12px;
-  line-height: 1.25;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .nuo-detail-panel {
@@ -894,16 +901,17 @@
 .nuo-detail-panel h3 {
   margin: 6px 0 0;
   color: var(--red-hot);
-  font-family: var(--serif);
-  font-size: 26px;
-  line-height: 1;
+  font-family: var(--serif, "Nuo Serif", serif);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
 .nuo-detail-panel p {
   margin: 8px 0 0;
   color: var(--muted);
-  font-size: 13px;
-  line-height: 1.55;
+  font-size: 16px;
+  line-height: 1.8;
 }
 
 .nuo-detail-image {
@@ -965,11 +973,11 @@
   }
 
   .nuo-overlay-panel h1 {
-    font-size: clamp(34px, 10vw, 56px);
+    font-size: 28px;
   }
 
   .nuo-overlay-panel p {
-    line-height: 1.55;
+    line-height: 1.8;
   }
 
   .nuo-hud {
@@ -1083,11 +1091,6 @@
     padding: 7px 8px;
   }
 
-  .nuo-reset-panel p,
-  .nuo-shortcut-panel p {
-    font-size: 13px;
-  }
-
   .nuo-overlay-panel {
     padding: 18px 14px;
   }
@@ -1102,7 +1105,7 @@
   }
 
   .nuo-reward-meta {
-    font-size: 11px;
+    font-size: 13px;
   }
 
   .nuo-target-stat {
@@ -1114,7 +1117,7 @@
   }
 
   .nuo-gallery-title h2 {
-    font-size: 25px;
+    font-size: 24px;
   }
 }
 

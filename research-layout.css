@@ -1,0 +1,382 @@
+/* These browsers keep their natural height; a short result never fills a detail card. */
+#color-atlas .color-region-panel,
+#color-atlas .color-mask-panel {
+  min-height: 0;
+  align-self: start;
+}
+
+#color-atlas .color-region-layout,
+#color-atlas .color-mask-workspace {
+  align-items: start;
+}
+
+#color-atlas .color-region-list,
+#color-atlas .color-mask-list {
+  contain: none;
+  height: auto;
+  min-height: 0;
+  max-height: min(66vh, 620px);
+  max-height: min(66svh, 620px);
+  align-self: start;
+  overflow: auto;
+}
+
+#color-atlas .color-region-detail,
+#color-atlas .color-mask-detail {
+  min-height: 0;
+  align-self: start;
+  overflow-wrap: anywhere;
+}
+
+/* Few results sit above the detail instead of leaving an empty parallel column. */
+#color-atlas .color-mask-workspace.has-few-results {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+#color-atlas .has-few-results .color-mask-list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  max-height: none;
+}
+
+#color-atlas .has-no-results .color-mask-detail,
+#color-atlas .color-mask-panel:has(.has-few-results) .color-scroll-hint {
+  display: none;
+}
+
+@media (min-width: 700px) {
+  #color-atlas .has-few-results:not(.has-no-results) .color-mask-detail {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: repeat(4, min-content) 1fr;
+    align-items: start;
+    column-gap: var(--layout-column-space);
+  }
+
+  #color-atlas .has-few-results .color-mask-detail > :not(.color-bars) {
+    grid-column: 1;
+  }
+
+  #color-atlas .has-few-results .color-mask-detail > .color-bars {
+    grid-column: 2;
+    grid-row: 1 / span 5;
+    margin-top: 0;
+  }
+}
+
+/* The single-panel desktop layout has room for both sets of region statistics. */
+@media (min-width: 1081px) {
+  #color-atlas .color-region-detail {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--layout-column-space);
+  }
+
+  #color-atlas .color-region-detail > :is(small, h3, p, .color-empty) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  #color-atlas .color-region-list,
+  #color-atlas .color-mask-list {
+    max-height: min(52vh, 460px);
+    max-height: min(52svh, 460px);
+  }
+}
+
+/* All eight chapters share the directory's rail, including formerly wider charts. */
+#research-library { --research-width: min(1180px, 90vw); }
+#research-library > .section {
+  width: var(--research-width);
+  margin-inline: auto;
+  min-height: 0;
+  padding: var(--layout-section-space) 0;
+  background: none;
+}
+#research-library > .section > .section-inner { width: 100%; }
+#research-library > .section + .section { border-top: 1px solid var(--line); }
+#research-library .section-meta { margin-bottom: var(--layout-heading-space); }
+#research-library .section-meta .section-desc { margin-top: var(--layout-title-space); }
+#research-library .section-meta:has(+ .research-note) { margin-bottom: var(--layout-title-space); }
+#research-library .section-inner > .research-note {
+  max-width: 80ch;
+  margin: 0 0 var(--layout-heading-space);
+  padding: 0;
+}
+#research-library :is(.insight-shell, .color-atlas-shell, .deck-shell) {
+  margin-top: 0;
+}
+#research-library #global-compare .feature-grid { margin-top: 0; }
+#research-library .color-atlas-stage { transform: none; }
+#research-library .color-region-browser {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--layout-group-space);
+  margin-top: var(--layout-group-space);
+}
+
+/* Chapter > chart > selected detail: avoid giving every nested box equal weight. */
+#research-library .insight-deck {
+  background: rgba(255,240,210,.035);
+  box-shadow: none;
+}
+#research-library .insight-deck::before { display: none; }
+#research-library .insight-chart-panel {
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  padding: 0;
+}
+#research-library .archive-case-strip {
+  border: 0;
+  background: none;
+  padding: 0;
+  margin-top: var(--layout-group-space);
+}
+#research-library .color-atlas-metric strong {
+  font-size: 22px;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+@media (min-width: 1081px) {
+  #research-library .archive-workspace {
+    grid-template-columns: minmax(200px, 240px) minmax(0, 1fr) minmax(240px, 280px);
+  }
+  #research-library :is(.insight-shell, .color-atlas-shell, .deck-shell) {
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: var(--layout-column-space);
+    align-items: start;
+  }
+  #research-library .insight-slide-grid {
+    grid-template-columns: minmax(0, 1fr) 200px;
+    gap: var(--layout-column-space);
+  }
+  #research-library .insight-slide:nth-child(2) .insight-slide-grid,
+  #research-library .insight-slide:nth-child(3) .insight-slide-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  #research-library { --research-width: 88vw; }
+}
+
+/* Each analysis sizes itself; offscreen slides must not stretch shorter charts. */
+#visual-insight .insight-shell,
+#visual-insight .insight-slide-grid {
+  align-items: start;
+}
+
+#visual-insight :is(.insight-control-card, .insight-deck, .insight-chart-panel, .insight-detail) {
+  min-height: 0;
+  align-self: start;
+}
+
+#visual-insight .insight-track {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  transform: none;
+  transition: none;
+}
+
+#visual-insight .insight-slide[hidden] { display: none; }
+#visual-insight .insight-slide-grid { height: auto; }
+
+#visual-insight .insight-deck-nav {
+  position: relative;
+  inset: auto;
+  margin: 0 var(--layout-card-space) var(--layout-card-space);
+}
+
+#visual-insight .emotion-scatter {
+  height: auto;
+  aspect-ratio: 680 / 520;
+}
+
+/* Reading cards switch with controls; a page scroll never drags this container. */
+#compare-section .deck-track {
+  display: block;
+  min-height: 0;
+  transform: none;
+  transition: none;
+  will-change: auto;
+}
+#compare-section .deck-card[hidden] { display: none; }
+
+/* Avoid large, nested compositing surfaces during touch scrolling. */
+@media (max-width: 900px), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  body::before, body::after,
+  #visual-insight .insight-deck::before,
+  #color-atlas .color-atlas-stage::before,
+  #color-atlas .color-atlas-stage::after { display: none; }
+
+  #research-library * {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  #research-library :is(.insight-control-card, .insight-deck, .insight-slide, .insight-card,
+    .color-atlas-panel, .color-atlas-stage, .color-region-panel, .color-mask-panel,
+    .color-selected-card, .feature, .deck-control) { box-shadow: none; }
+
+  #visual-insight .insight-deck,
+  #color-atlas .color-atlas-stage { contain: none; }
+
+  #color-atlas { --color-stage-progress: 1; }
+  #color-atlas .color-atlas-stage,
+  #research-library .period-card { transform: none; }
+  #research-library .period-card { opacity: 1; }
+
+  #research-library .section-meta {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Spacing follows the shared chapter / group / card / label scale. Charts retain
+   their own dimensions; these rules only govern the reading flow around them. */
+#research-library :is(.insight-shell, .color-atlas-shell, .deck-shell,
+  .insight-slide-grid, .overview-2col, .deepdive-layout, .color-region-layout,
+  .color-mask-workspace) { gap: var(--layout-column-space); }
+#research-library :is(.atlas-archive, .period-card, .archive-filter, .archive-chart,
+  .archive-detail, .insight-control-card, .insight-slide, .insight-detail,
+  .color-atlas-panel, .color-region-panel, .color-mask-panel, .color-selected-card,
+  .color-region-detail, .color-mask-detail, .deck-control, .deck-card,
+  .feature, .comparison-note, .deepdive-scatter-col) { padding: var(--layout-card-space); }
+#research-library :is(.insight-control-card, .insight-chart-panel, .insight-detail,
+  .color-atlas-panel, .color-region-panel, .color-mask-panel, .color-region-detail,
+  .color-mask-detail, .deck-control, .deepdive-scatter-col, .deepdive-extremity-col) > h3,
+#research-library .ov-subtitle { margin: 0 0 var(--layout-title-space); }
+#research-library :is(.insight-detail, .color-region-detail, .color-mask-detail) > small {
+  margin-bottom: var(--space-2);
+}
+
+/* A group starts once: avoid adding both a parent's gap and its child's margin. */
+#research-library .timeline-track { gap: var(--layout-card-space); padding-block: 0 var(--space-2); }
+#research-library .period-figure { margin: var(--layout-card-space) 0 0; }
+#research-library .period-card h3 { margin-bottom: var(--layout-title-space); }
+#research-library .period-figure figcaption { gap: var(--space-2); margin-top: var(--space-4); }
+#research-library .archive-summary { gap: var(--space-3); margin-bottom: var(--layout-card-space); }
+#research-library .archive-workspace { gap: var(--space-4); }
+#research-library .archive-filter { gap: var(--layout-card-space); }
+#research-library :is(.archive-field, .color-control) { gap: var(--space-2); }
+#research-library :is(.archive-chart-head, .case-head) { gap: var(--space-4); margin-bottom: var(--layout-title-space); }
+#research-library .detail-copy { gap: var(--space-4); }
+#research-library .detail-media { margin-bottom: var(--space-4); }
+#research-library .detail-list { gap: var(--space-4); }
+#research-library .detail-list > div { padding-top: 0; }
+#research-library .detail-list dt { margin-bottom: var(--space-2); }
+#research-library :is(.case-list, .feature-grid, .quadrant-grid, .overview-right,
+  .eco-insight-row, .align-summary-grid, .align-deviation-bars) { gap: var(--space-4); }
+#research-library :is(.archive-summary > div, .case-item, .insight-metric,
+  .color-atlas-metric, .insight-tab, .deck-tab, .semantic-row, .level-row,
+  .insight-rank-row, .color-region-row, .color-mask-row) { padding: var(--space-3); }
+#research-library .case-item img { margin-bottom: var(--space-3); }
+#research-library .case-meta { margin-top: var(--space-2); }
+#research-library :is(.insight-metrics, .insight-tabs, .color-atlas-metrics,
+  .color-family-stack, .color-top-list, .insight-keyvals, .color-bars,
+  .color-region-layout, .color-mask-controls, .color-mask-workspace) {
+  margin-top: var(--layout-card-space);
+}
+#research-library :is(.insight-metrics, .insight-tabs, .color-atlas-metrics,
+  .color-family-stack, .color-top-list, .color-region-list, .color-mask-list,
+  .color-bars, .color-mask-controls, .color-atlas-toolbar, .semantic-bars,
+  .level-bars, .rank-list, .deck-tabs, .eco-bars-wrap) { gap: var(--space-3); }
+#research-library :is(.insight-keyvals, .color-detail-grid, .color-mask-meta) { gap: var(--space-2); }
+#research-library :is(.insight-keyvals, .color-detail-grid, .color-mask-meta) > div {
+  gap: var(--space-3);
+  padding-bottom: 0;
+}
+#research-library .quadrant-filter-row { gap: var(--space-2); margin-bottom: var(--space-4); }
+#research-library .quadrant-card { padding: var(--space-4); }
+#research-library .quadrant-card > strong { margin-top: var(--space-4); }
+#research-library .quadrant-card > p { margin-top: var(--space-2); }
+#research-library :is(.color-region-panel, .color-mask-panel) .color-scroll-hint {
+  margin-top: var(--space-3);
+}
+#research-library .color-scroll-hint + :is(.color-region-layout, .color-mask-workspace) {
+  margin-top: var(--space-3);
+}
+#research-library .color-preview-image { margin: var(--layout-card-space) 0 0; }
+#research-library .color-preview-image figcaption { margin-top: var(--space-2); }
+#research-library .color-palette-image { margin: var(--space-4) 0; }
+#research-library .color-family-strip { margin-top: var(--space-2); }
+#research-library .color-selected-card { gap: var(--space-4); }
+#research-library .color-selected-card h3 { margin: 0 0 var(--space-2); }
+#research-library .color-selected-card small { margin-bottom: var(--space-2); }
+
+#research-library #global-compare .overview-2col { margin-top: var(--layout-group-space); }
+#research-library .feature { align-content: start; gap: var(--space-3); }
+#research-library .feature :is(small, strong) { margin: 0; }
+#research-library .ov-intro { margin-bottom: var(--layout-card-space); }
+#research-library :is(.deck-control > p, .deck-tabs, .deck-stats) { margin: 0 0 var(--layout-card-space); }
+#research-library .deck-stats { gap: var(--space-4); padding: 0; }
+#research-library .deck-card { gap: var(--layout-card-space); }
+#research-library .deck-dots { gap: var(--space-3); margin: 0 var(--layout-card-space) var(--layout-card-space); }
+#research-library .align-radar-header { margin-bottom: 0; }
+#research-library :is(.ov-sem-card, .finding-card, .align-card, .dev-bar-card,
+  .comparison-question-panel > div) { padding: var(--space-4); }
+#research-library :is(.ov-sem-card h4, .align-card h4, .finding-card strong,
+  .comparison-note p) { margin: 0 0 var(--space-2); }
+#research-library .comparison-note p { margin: var(--space-2) 0 0; }
+#research-library .comparison-question-panel { gap: var(--space-3); margin-top: var(--layout-card-space); }
+#research-library .comparison-question-panel h4 { margin-block: var(--space-2); }
+#research-library :is(.comparison-copy, .ext-insight p) { margin: 0 0 var(--space-2); }
+#research-library :is(.comparison-copy, .ext-insight p):last-child { margin-bottom: 0; }
+#research-library .comparison-tradition strong + .comparison-copy { margin-top: var(--space-2); }
+
+/* Overview values belong together. Keep two compact columns on phones and in
+   desktop sidebars; do not force square heights when a label needs more room. */
+#research-library :is(.insight-metrics, .color-atlas-metrics) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+}
+#research-library :is(.insight-metric, .color-atlas-metric) {
+  min-width: 0;
+  min-height: 96px;
+  border-radius: 12px;
+  padding: var(--space-3);
+}
+#research-library :is(.insight-metric, .color-atlas-metric) span {
+  line-height: 1.6;
+  margin-top: var(--space-2);
+}
+#research-library .insight-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+#research-library .insight-tab {
+  min-width: 0;
+  min-height: 44px;
+  padding: var(--space-2);
+  border-radius: 10px;
+  text-align: center;
+}
+/* Each control already names its destination; repeating 'click to switch' adds
+   a second line to every button without helping the choice. */
+#research-library .insight-tab span { display: none; }
+#research-library .quadrant-card { min-height: 0; }
+#research-library .quadrant-card .insight-meter { margin-top: var(--space-3); }
+#research-library :is(.feature, .deck-shell) { min-height: 0; }
+
+@media (min-width: 641px) and (max-width: 1080px) {
+  #research-library .insight-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  #research-library .color-atlas-metrics,
+  #research-library .insight-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  #research-library .case-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Keep each bar beside its value instead of giving it three separate rows. */
+  #research-library :is(.semantic-row, .level-row, .insight-rank-row) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-2);
+  }
+  #research-library :is(.semantic-row, .level-row, .insight-rank-row) > strong {
+    grid-column: 1 / -1;
+  }
+  #research-library :is(.semantic-row, .level-row, .insight-rank-row) > em {
+    white-space: nowrap;
+    text-align: right;
+  }
+  #research-library .insight-rank-row .insight-meter { margin-top: 0; }
+}

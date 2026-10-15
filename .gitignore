@@ -1,7 +1,14 @@
 # System
+.DS_Store
 Thumbs.db
 Desktop.ini
 *.tmp
+
+# Local verification output
+__pycache__/
+*.pyc
+/qa/
+/nuo-stickman-mask-game/qa/
 
 # Dev server logs
 *.log

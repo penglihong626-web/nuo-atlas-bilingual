@@ -1,23 +1,35 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>傩面具 3D 地图收集小游戏</title>
-  <link rel="stylesheet" href="style.css" data-nuo-game-style>
+  <title>趣味小游戏</title>
+  <link rel="stylesheet" href="../fonts.css">
+  <style>
+    body { margin: 0; background: #100b08; }
+    .nuo-standalone-page { min-height: 100vh; box-sizing: border-box; padding: 12px; display: grid; align-items: center; }
+    .nuo-standalone-mount { width: min(1200px, 100%); margin: 0 auto; }
+  </style>
+  <link rel="stylesheet" href="map-quest.css?v=map-heading-20261014">
+  <link rel="stylesheet" href="../locales/english.css?v=mobile-icons-20261015b">
 </head>
 <body class="nuo-game-standalone">
   <main class="nuo-standalone-page">
-    <section id="nuo-stickman-game" class="nuo-standalone-mount" aria-label="傩面具 3D 火柴人小游戏"></section>
+    <div class="standalone-language"><button class="language-switch" type="button" data-language-switch data-i18n-skip aria-label="Switch to Chinese">中文</button></div>
+    <section id="nuo-stickman-game" class="nuo-standalone-mount" aria-label="趣味小游戏"></section>
   </main>
 
-  <script src="game.js"></script>
+  <script src="../locales/site-en.js?v=en-20261014c"></script>
+  <script src="../locales/interactive-en.js?v=en-20261014c"></script>
+  <script src="../locales/i18n.js?v=en-20261014c"></script>
+  <script src="map-quest-data.js?v=map-tap-20261014"></script>
+  <script src="map-quest.js?v=map-tap-20261014"></script>
   <script>
     window.addEventListener("DOMContentLoaded", function () {
-      window.nuoGame = window.NuoStickmanGame.mount("#nuo-stickman-game", {
+      window.nuoGame = window.NuoCultureGame.mount("#nuo-stickman-game", {
         assetBase: "./",
-        height: Math.min(760, Math.max(560, window.innerHeight - 24)),
-        sound: false
+        createHref: "../index.html#galaxy",
+        exploreHref: "../index.html#journey-explore"
       });
     });
   </script>

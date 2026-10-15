@@ -191,6 +191,9 @@
       this.elapsed = 0;
       this.lastFrame = performance.now();
       this.ready = false;
+      this.stageVisible = !("IntersectionObserver" in window);
+      this.renderActive = false;
+      this.raf = null;
       this.targetPoint = null;
       this.nearestItem = null;
       this.nearPromptItemId = null;
@@ -225,8 +228,12 @@
       this.disposables = [];
       this.animate = this.animate.bind(this);
       this.handleResize = this.handleResize.bind(this);
+      this.syncVisibility = this.syncVisibility.bind(this);
       this.handleKeyDown = this.handleKeyDown.bind(this);
       this.handleKeyUp = this.handleKeyUp.bind(this);
+      this.releaseKeys = () => {
+        for (const direction of Object.keys(this.keys)) this.keys[direction] = false;
+      };
     }
 
     async init() {
@@ -261,7 +268,7 @@
           "开始探索"
         );
         this.setStatus("进入第一关，先点亮两座心火灯柱打开木栅。");
-        this.raf = requestAnimationFrame(this.animate);
+        this.syncVisibility();
       } catch (error) {
         console.error(error);
         this.state = "error";
@@ -276,7 +283,7 @@
       this.root.style.minHeight = `${this.height}px`;
       this.root.innerHTML = `
         <div class="nuo-game-root" style="height:${this.height}px; min-height:${this.height}px">
-          <section class="nuo-stage" data-stage aria-label="面具星图闯关地图">
+          <section class="nuo-stage" data-stage tabindex="0" aria-label="面具星图闯关地图">
             <div class="nuo-canvas-slot" data-canvas-slot></div>
             <div class="nuo-hud">
               <div class="nuo-stats" aria-label="探索状态">
@@ -310,7 +317,6 @@
             </div>
             <div class="nuo-overlay is-visible" data-overlay>
               <div class="nuo-overlay-panel">
-                <small>NUO MASK STARMAP</small>
                 <h1 data-overlay-title>面具星图</h1>
                 <p data-overlay-copy>正在载入矢量面具与关卡地图。</p>
                 <div class="nuo-level-reward" data-level-reward hidden></div>
@@ -322,7 +328,6 @@
             </div>
             <div class="nuo-reset-menu" data-reset-menu aria-hidden="true">
               <div class="nuo-reset-panel" role="dialog" aria-modal="true" aria-labelledby="nuo-reset-title">
-                <small>RESET</small>
                 <h2 id="nuo-reset-title">重置游戏</h2>
                 <p>选择要重置的范围。回到中心不会改变图鉴，重置本关会保留之前关卡，重新开始全部会清空所有收集。</p>
                 <div class="nuo-reset-actions">
@@ -335,9 +340,8 @@
             </div>
             <div class="nuo-shortcut-menu" data-shortcut-menu aria-hidden="true">
               <div class="nuo-shortcut-panel" role="dialog" aria-modal="true" aria-labelledby="nuo-shortcut-title">
-                <small>SHORTCUTS</small>
                 <h2 id="nuo-shortcut-title">快捷键</h2>
-                <p>键盘快捷键只在游戏区域和页面未输入文字时生效。移动端仍可使用下方触控按钮。</p>
+                <p>点击地图或用 Tab 选中游戏后，键盘快捷键才会生效；输入文字时不启用。移动端仍可使用下方触控按钮。</p>
                 <div class="nuo-shortcut-grid">
                   ${SHORTCUT_GROUPS.map((group) => `
                     <section class="nuo-shortcut-group">
@@ -406,7 +410,10 @@
     bindUi() {
       this.root.addEventListener("click", (event) => {
         const actionButton = event.target.closest("[data-action]");
-        if (actionButton) this.handleAction(actionButton.dataset.action);
+        if (actionButton) {
+          this.handleAction(actionButton.dataset.action);
+          if (actionButton.dataset.action === "start") this.stage.focus({ preventScroll: true });
+        }
 
         if (event.target === this.resetMenu) this.closeResetMenu();
         if (event.target === this.shortcutMenu) this.closeShortcutMenu();
@@ -422,6 +429,7 @@
       });
 
       this.stage.addEventListener("pointerdown", (event) => {
+        if (!event.target.closest("button, a, input, textarea, select, [contenteditable]")) this.stage.focus({ preventScroll: true });
         this.dragStart = { x: event.clientX, y: event.clientY };
         this.dragged = false;
       });
@@ -439,9 +447,21 @@
         if (point) this.targetPoint = point;
       });
 
-      document.addEventListener("keydown", this.handleKeyDown);
-      document.addEventListener("keyup", this.handleKeyUp);
+      this.root.addEventListener("keydown", this.handleKeyDown);
+      this.root.addEventListener("keyup", this.handleKeyUp);
+      this.root.addEventListener("focusout", (event) => {
+        if (!this.root.contains(event.relatedTarget)) this.releaseKeys();
+      });
+      window.addEventListener("blur", this.releaseKeys);
       window.addEventListener("resize", this.handleResize);
+      document.addEventListener("visibilitychange", this.syncVisibility);
+      if ("IntersectionObserver" in window) {
+        this.visibilityObserver = new IntersectionObserver(([entry]) => {
+          this.stageVisible = entry.isIntersecting;
+          this.syncVisibility();
+        });
+        this.visibilityObserver.observe(this.stage);
+      }
       if ("ResizeObserver" in window) {
         this.resizeObserver = new ResizeObserver(this.handleResize);
         this.resizeObserver.observe(this.stage);
@@ -474,14 +494,17 @@
     }
 
     handleKeyDown(event) {
-      if (isTypingTarget(event.target)) return;
+      if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey || isTypingTarget(event.target)) return;
+      const bounds = this.stage.getBoundingClientRect();
+      if (!bounds.width || !bounds.height || bounds.bottom <= 0 || bounds.top >= window.innerHeight) return;
       const key = event.key;
+      if ((key === "Enter" || key === " ") && event.target.closest("button, a, summary, [role='button']")) return;
       const shortcutOpen = this.shortcutMenu && this.shortcutMenu.classList.contains("is-visible");
       if (shortcutOpen) {
         if (key === "Escape" || key === "h" || key === "H" || key === "?") {
           this.closeShortcutMenu();
+          event.preventDefault();
         }
-        event.preventDefault();
         return;
       }
       if (key === "h" || key === "H" || key === "?") {
@@ -624,10 +647,10 @@
       ctx.lineWidth = 9;
       ctx.strokeRect(26, 28, 204, 200);
       ctx.fillStyle = "#ffe4a3";
-      ctx.font = "bold 32px serif";
+      ctx.font = '600 32px "Nuo Sans", sans-serif';
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(item.regionOrCountry || "MASK", 128, 128);
+      ctx.fillText(item.regionOrCountry || "面具", 128, 128);
       const texture = new THREE.CanvasTexture(canvas);
       texture.colorSpace = THREE.SRGBColorSpace;
       return texture;
@@ -1555,7 +1578,24 @@
       this.setStatus("跳跃中。落地后继续向面具节点移动。");
     }
 
+    syncVisibility() {
+      this.renderActive = this.ready && this.state !== "destroyed" && !document.hidden && this.stageVisible;
+      if (!this.renderActive) {
+        if (this.raf !== null) cancelAnimationFrame(this.raf);
+        this.raf = null;
+        this.releaseKeys();
+        this.dragStart = null;
+      } else if (this.raf === null) {
+        // Visibility suspends the clock without changing a user's pause/menu state.
+        this.lastFrame = performance.now();
+        this.handleResize();
+        this.raf = requestAnimationFrame(this.animate);
+      }
+    }
+
     animate(now) {
+      this.raf = null;
+      if (!this.renderActive) return;
       const dt = Math.min((now - this.lastFrame) / 1000 || 0, 0.05);
       this.lastFrame = now;
       this.elapsed += dt;
@@ -2380,7 +2420,7 @@
       const item = this.selectedItem;
       const collected = this.collection.has(item.id);
       const accessible = this.isItemAccessible(item);
-      const groupLabel = item.group === "china" ? "CHINA MASK" : "WORLD MASK";
+      const groupLabel = item.group === "china" ? "中国傩面" : "世界面具";
       const copy = collected
         ? `${item.label}。${this.getCultureLine(item)}`
         : accessible
@@ -2467,8 +2507,12 @@
 
     handleResize() {
       if (!this.renderer || !this.camera || !this.stage) return;
+      if (!this.stage.clientWidth || !this.stage.clientHeight) return;
       const width = Math.max(320, this.stage.clientWidth);
       const height = Math.max(360, this.stage.clientHeight);
+      if (this.renderWidth === width && this.renderHeight === height) return;
+      this.renderWidth = width;
+      this.renderHeight = height;
       this.camera.aspect = width / height;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(width, height, false);
@@ -2551,11 +2595,15 @@
     }
 
     unmount() {
-      if (this.raf) cancelAnimationFrame(this.raf);
+      this.state = "destroyed";
+      this.syncVisibility();
       if (this.galleryFlashTimer) window.clearTimeout(this.galleryFlashTimer);
-      document.removeEventListener("keydown", this.handleKeyDown);
-      document.removeEventListener("keyup", this.handleKeyUp);
+      this.root.removeEventListener("keydown", this.handleKeyDown);
+      this.root.removeEventListener("keyup", this.handleKeyUp);
+      window.removeEventListener("blur", this.releaseKeys);
       window.removeEventListener("resize", this.handleResize);
+      document.removeEventListener("visibilitychange", this.syncVisibility);
+      if (this.visibilityObserver) this.visibilityObserver.disconnect();
       if (this.resizeObserver) this.resizeObserver.disconnect();
       this.destroyScene();
       if (this.root && this.root.parentNode) this.root.parentNode.removeChild(this.root);
@@ -2588,6 +2636,8 @@
       this.scene = null;
       this.camera = null;
       this.renderer = null;
+      this.renderWidth = null;
+      this.renderHeight = null;
     }
   }
 

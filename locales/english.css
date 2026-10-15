@@ -1,0 +1,130 @@
+/* Use the Chinese site's monochrome glyphs in English too, including on iOS. */
+@font-face {
+  font-family: "Nuo UI Symbols";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: block;
+  src: url(../assets/fonts/noto-sans-sc-072.woff2) format("woff2");
+  unicode-range: U+2194, U+2196-2199;
+}
+@font-face {
+  font-family: "Nuo UI Symbols";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: block;
+  src: url(../assets/fonts/noto-sans-sc-069.woff2) format("woff2");
+  unicode-range: U+2713-2718;
+}
+@font-face {
+  font-family: "Nuo UI Symbols";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: block;
+  src: url(../assets/fonts/noto-sans-sc-082.woff2) format("woff2");
+  unicode-range: U+2190;
+}
+@font-face {
+  font-family: "Nuo UI Symbols";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: block;
+  src: url(../assets/fonts/noto-sans-sc-086.woff2) format("woff2");
+  unicode-range: U+2192;
+}
+@font-face {
+  font-family: "Nuo UI Symbols";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: block;
+  src: url(../assets/fonts/noto-sans-sc-081.woff2) format("woff2");
+  unicode-range: U+FF0B;
+}
+@font-face {
+  font-family: "Nuo UI Symbols";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: block;
+  src: url(../assets/fonts/noto-sans-sc-100.woff2) format("woff2");
+  unicode-range: U+002B, U+2039-203A, U+2191, U+2193, U+2212;
+}
+.nav-identity { display: flex; flex: 0 0 auto; align-items: center; gap: 8px; }
+.method-symbol { font-family: "Nuo Sans", sans-serif; }
+/* Keep the site's warm display treatment, with spacing suited to Latin text. */
+.language-switch {
+  flex: 0 0 auto;
+  min-width: 42px;
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 1px solid #e6b87855;
+  border-radius: 999px;
+  background: #fff0d208;
+  color: #ffe4a3;
+  font: 500 13px/1.4 var(--sans, system-ui, sans-serif);
+  cursor: pointer;
+}
+.language-switch:hover { background: #e6b8781c; }
+.language-switch:focus-visible { outline: 2px solid #90dfe1; outline-offset: 3px; }
+.standalone-language { display: flex; justify-content: flex-end; width: min(1200px, 100%); margin: 0 auto 8px; }
+:root:lang(en) { --display-tracking: .015em; --serif: Georgia, 'Times New Roman', serif; --sans: "Nuo UI Symbols", Arial, Helvetica, "Nuo Sans", sans-serif; }
+html:lang(en) body.journey-site { font-family: var(--sans); }
+html:lang(en) .journey-site .hero-title { font-size: clamp(58px, 6.2vw, 88px); letter-spacing: -.025em; line-height: 1.08; }
+html:lang(en) .journey-site .hero-title .line { white-space: normal; width: auto; }
+html:lang(en) .journey-site .hero-promise { letter-spacing: .01em; }
+html:lang(en) .journey-site .nav { gap: 14px; }
+html:lang(en) .journey-site .nav-links { gap: 18px; }
+html:lang(en) .journey-site .nav-cta { white-space: nowrap; }
+html:lang(en) .journey-site :is(.research-contents a, .insight-tab, .world-object-choice, .creation-method, .coloring-template) { min-width: 0; }
+html:lang(en) .journey-site :is(.research-contents a, .world-object-choice strong, .creation-method strong) { overflow-wrap: normal; }
+html:lang(en) .journey-site .region-score-matrix { min-width: 760px; }
+html:lang(en) .journey-site :is(.matrix-head, .matrix-label) { overflow-wrap: normal; hyphens: auto; }
+html:lang(en) .mq-game { --mq-serif: Georgia, 'Times New Roman', serif; --mq-sans: "Nuo UI Symbols", Arial, Helvetica, "Nuo Sans", sans-serif; }
+html:lang(en) .mq-game .mq-header h3 { letter-spacing: 0; }
+html:lang(en) .mq-game .mq-prop > span { overflow-wrap: normal; hyphens: auto; }
+html:lang(en) .mq-game .mq-location { line-height: 1.35; }
+html:lang(en) .mq-game .mq-province-label { font-size: 11px; letter-spacing: 0; }
+html:lang(en) .mq-game .mq-beacon text { font-size: 16px; letter-spacing: 0; }
+@media (max-width: 1200px) {
+  html:lang(en) .journey-site .nav-links { display: none; }
+  html:lang(en) .journey-site .site-menu { display: block; margin-left: auto; }
+}
+@media (max-width: 600px) {
+  .journey-site .nav .language-switch { min-width: 37px; min-height: 36px; padding: 5px 7px; }
+  html:lang(en) .journey-site .nav { gap: 4px; }
+  html:lang(en) .journey-site .brand { font-size: 12px; gap: 5px; }
+  html:lang(en) .journey-site .nav-cta { padding: 7px 9px; font-size: 12px; }
+  html:lang(en) .journey-site .site-menu summary { font-size: 12px; padding-inline: 6px; }
+  html:lang(en) .journey-site .hero-title { font-size: clamp(48px, 12vw, 64px); }
+  html:lang(en) .journey-site .hero-promise { font-size: 23px; }
+  html:lang(en) .journey-site .title-grid { gap: 25px; }
+  html:lang(en) .journey-site .title-card { padding: 18px; }
+  html:lang(en) .journey-site .title-card .index { letter-spacing: .02em; }
+  html:lang(en) .journey-site .hero-sub { line-height: 1.65; }
+  html:lang(en) #color-atlas .ca-controls { grid-template-columns: minmax(0, 1fr); }
+  html:lang(en) .mq-game .mq-header h3 { font-size: 19px; }
+  html:lang(en) .mq-game .mq-subtitle { max-width: 22em; }
+  html:lang(en) .mq-game .mq-layout { grid-template-columns: minmax(0, 1fr) 96px; }
+  html:lang(en) .mq-game .mq-prop { padding: 4px; row-gap: 0; }
+  html:lang(en) .mq-game .mq-prop > span { font-size: 11px; align-self: center; }
+  html:lang(en) .mq-game .mq-inventory h4 { font-size: 14px; }
+  html:lang(en) .mq-game .mq-mask-name { font-size: 17px; }
+  html:lang(en) .mq-game .mq-use { font-size: 11px; }
+  html:lang(en) .mq-game .mq-map-tools button:last-child { width: 43px; }
+  html:lang(en) .mq-game .mq-location { top: 48px; max-width: calc(100% - 22px); padding: 3px 6px; border-radius: 4px; background: #17100de8; }
+  html:lang(en) .mq-game .mq-riddle { font-size: 11px; }
+  html:lang(en) .painting-desk .color-dock-heading { flex-wrap: wrap; }
+  html:lang(en) .painting-desk .current-color { flex: 0 0 100%; }
+  html:lang(en) .painting-desk .color-dock-heading > button { flex: 1 1 0; justify-content: center; white-space: nowrap; }
+  .nuo-game-standalone .nuo-standalone-page { align-content: center; }
+  .nuo-game-standalone .mq-game { height: calc(100svh - 74px); min-height: 460px; }
+}
+@media (max-width: 480px) {
+  html:lang(en) .mq-game .mq-dialog .mq-collection { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 360px) {
+  html:lang(en) .journey-site .nav-cta { max-width: 91px; white-space: normal; text-align: center; }
+  html:lang(en) #research-library #compare-section .deck-tabs { gap: 8px; }
+  html:lang(en) #research-library #compare-section .deck-tab { padding-inline: 3px; }
+  html:lang(en) #research-library #compare-section .dt-label { font-size: 13px; }
+  html:lang(en) .region-choice { flex-direction: column; align-items: flex-start; gap: 4px; }
+  html:lang(en) .painting-desk #freeDrawingControls { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

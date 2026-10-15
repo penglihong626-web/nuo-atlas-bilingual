@@ -1,0 +1,15 @@
+.nuo-color-picker { display: grid; grid-template-columns: minmax(150px,208px) minmax(84px,1fr); align-items: center; gap: 0 14px; width: 100%; max-width: 344px; margin: 0 auto; color: #fff0d2; font: 13px/1.6 var(--sans,sans-serif); }
+.nuo-color-picker .ncp-wheel { position: relative; width: 100%; aspect-ratio: 1; isolation: isolate; touch-action: none; user-select: none; -webkit-user-select: none; }
+.nuo-color-picker .ncp-hue { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00); cursor: crosshair; touch-action: none; -webkit-tap-highlight-color: transparent; }
+.nuo-color-picker .ncp-hue::before { content: ''; position: absolute; inset: 11%; border-radius: 50%; background: #17110c; box-shadow: 0 0 0 1px rgba(255,240,210,.12); }
+.nuo-color-picker .ncp-sv { position: absolute; width: 55%; height: 55%; left: 22.5%; top: 22.5%; background-image: linear-gradient(to top,#000,transparent),linear-gradient(to right,#fff,transparent); cursor: crosshair; border-radius: 2px; touch-action: none; -webkit-tap-highlight-color: transparent; }
+.nuo-color-picker .ncp-hue-thumb,.nuo-color-picker .ncp-sv-thumb { position: absolute; width: 17px; height: 17px; border: 2px solid white; border-radius: 50%; transform: translate(-50%,-50%); box-shadow: 0 0 0 1px #282019,0 1px 3px #0008; pointer-events: none; z-index: 1; box-sizing: border-box; }
+.nuo-color-picker .ncp-controls { min-width: 0; }
+.nuo-color-picker .ncp-preview { display: block; width: 44px; height: 44px; margin-bottom: 9px; border-radius: 50%; border: 1px solid #927952; }
+.nuo-color-picker .ncp-hex-label { display: block; color: #cbbb9f; font: 13px/1.7 var(--sans,sans-serif); }
+.nuo-color-picker .ncp-hex { display: block; width: 100%; min-width: 0; height: 44px; margin: 4px 0 0; padding: 7px 6px; border: 1px solid #887250; border-radius: 4px; box-sizing: border-box; color: #fff0d2; background: #100b08; font: 16px/1.4 var(--sans,sans-serif); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.nuo-color-picker .ncp-hint { margin: 10px 0 0; color: #b4a693; font: 13px/1.7 var(--sans,sans-serif); }
+.nuo-color-picker .ncp-error { grid-column: 1/-1; margin: 0; color: #f3b49e; font: 13px/1.7 var(--sans,sans-serif); }
+.nuo-color-picker .ncp-error:not(:empty) { margin-top: 9px; }
+.nuo-color-picker .ncp-hex[aria-invalid=true] { border-color: #f3b49e; }
+.nuo-color-picker :is(.ncp-hue,.ncp-sv,.ncp-hex):focus-visible { outline: 2px solid #fff0d2; outline-offset: 4px; }

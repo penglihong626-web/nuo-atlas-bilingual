@@ -1,0 +1,41 @@
+/* Shared spacing scale. Reading layouts use roles; compact drawing controls
+   keep their existing touch-target geometry. Mobile changes roles, not sections. */
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --layout-section-space: 96px;
+  --layout-group-space: var(--space-12);
+  --layout-heading-space: var(--space-8);
+  --layout-title-space: var(--space-4);
+  --layout-card-space: var(--space-6);
+  --layout-column-space: var(--space-8);
+}
+@media (max-width: 600px) {
+  :root {
+    --layout-section-space: 64px;
+    --layout-group-space: var(--space-8);
+    --layout-heading-space: var(--space-6);
+    --layout-title-space: var(--space-3);
+    --layout-card-space: var(--space-4);
+    --layout-column-space: var(--space-6);
+  }
+}
+
+/* Eliminate browser-default paragraph margins; components specify relationships. */
+.journey-site :where(main p) { margin-block: 0; }
+.journey-site :is(.journey-heading, .section-meta) {
+  margin-bottom: var(--layout-heading-space);
+}
+.journey-site :is(.journey-heading, .section-meta) h2 { margin: 0; }
+.journey-site .section-meta .section-desc,
+.journey-site .journey-heading > p {
+  margin: var(--layout-title-space) 0 0;
+}
+.journey-site .culture-guide > p { margin: var(--layout-title-space) 0 0; }
+.journey-site .journey-status { margin: var(--space-3) 0; }
+.journey-site .journey-status:empty { min-height: 0; margin: 0; }

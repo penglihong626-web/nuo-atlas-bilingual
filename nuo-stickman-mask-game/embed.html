@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>傩面具地图收集小游戏嵌入示例</title>
-  <link rel="stylesheet" href="style.css" data-nuo-game-style>
+  <title>趣味小游戏嵌入示例</title>
+  <link rel="stylesheet" href="../fonts.css">
   <style>
     body {
       margin: 0;
@@ -13,7 +13,7 @@
         radial-gradient(circle at 50% 8%, rgba(255, 96, 52, 0.34), transparent 31vw),
         radial-gradient(circle at 78% 26%, rgba(255, 228, 163, 0.15), transparent 28vw),
         linear-gradient(180deg, #1a0c08 0%, #080403 34%, #050302 100%);
-      font-family: "Noto Serif SC", "Songti SC", STSong, SimSun, serif;
+      font-family: "Nuo Sans", "PingFang SC", sans-serif;
     }
 
     .embed-demo {
@@ -43,29 +43,38 @@
       line-height: 1.5;
     }
   </style>
+  <link rel="stylesheet" href="map-quest.css?v=map-heading-20261014">
+  <link rel="stylesheet" href="../locales/english.css?v=mobile-icons-20261015b">
 </head>
 <body>
   <main class="embed-demo">
-    <h1>傩面具 3D 地图收集小游戏</h1>
+    <div class="standalone-language"><button class="language-switch" type="button" data-language-switch data-i18n-skip aria-label="Switch to Chinese">中文</button></div>
+    <h1>趣味小游戏</h1>
     <div id="embedded-game"></div>
     <pre class="embed-code"><code>&lt;div id="nuo-game"&gt;&lt;/div&gt;
-&lt;script src="/nuo-stickman-mask-game/game.js"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" href="nuo-stickman-mask-game/map-quest.css"&gt;
+&lt;script src="nuo-stickman-mask-game/map-quest-data.js"&gt;&lt;/script&gt;
+&lt;script src="nuo-stickman-mask-game/map-quest.js"&gt;&lt;/script&gt;
 &lt;script&gt;
-  NuoStickmanGame.mount("#nuo-game", {
-    assetBase: "/nuo-stickman-mask-game/",
-    height: 640,
-    sound: false
+  NuoCultureGame.mount("#nuo-game", {
+    assetBase: "nuo-stickman-mask-game/",
+    createHref: "index.html#galaxy",
+    exploreHref: "index.html#journey-explore"
   });
 &lt;/script&gt;</code></pre>
   </main>
 
-  <script src="game.js"></script>
+  <script src="../locales/site-en.js?v=en-20261014c"></script>
+  <script src="../locales/interactive-en.js?v=en-20261014c"></script>
+  <script src="../locales/i18n.js?v=en-20261014c"></script>
+  <script src="map-quest-data.js?v=map-tap-20261014"></script>
+  <script src="map-quest.js?v=map-tap-20261014"></script>
   <script>
     window.addEventListener("DOMContentLoaded", function () {
-      window.embeddedNuoGame = window.NuoStickmanGame.mount("#embedded-game", {
+      window.embeddedNuoGame = window.NuoCultureGame.mount("#embedded-game", {
         assetBase: "./",
-        height: 640,
-        sound: false
+        createHref: "../index.html#galaxy",
+        exploreHref: "../index.html#journey-explore"
       });
     });
   </script>
