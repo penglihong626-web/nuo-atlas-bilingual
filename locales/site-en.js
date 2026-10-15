@@ -12,7 +12,7 @@ Object.assign(window.NUO_EN = window.NUO_EN || {}, {
   "目录": "Menu",
   "手机页面导航": "Mobile navigation",
   "开始认识": "Start exploring",
-  "傩面万象": "The World of Nuo",
+  "傩面万象": "The Myriad Faces of Nuo",
   "先认识，再创作。": "Discover. Then create.",
   "从江西萍乡湘东出发": "Begin in Xiangdong, Pingxiang, Jiangxi",
   "认识面具背后的角色与地方故事，留下打动你的参考，再把自己的期待或关心，做成一张可以珍藏、赠送的作品卡。": "Discover the characters and local stories behind Nuo masks. Save what inspires you, then turn your hopes or care for someone into an artwork card to keep or give.",
