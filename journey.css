@@ -3,6 +3,8 @@
    The drawing and atlas stages keep their own stricter touch-action: none. */
 html, body.journey-site { touch-action: manipulation; }
 .journey-site { min-height: 100vh; --faint: #b4a693; }
+/* Keep page-height-dependent body glows behind the reading surface. */
+.journey-site #journeyContent { background-color: var(--bg); }
 [hidden] { display: none !important; }
 :where(button,a,input,textarea,summary):focus-visible { outline: 2px solid var(--cyan); outline-offset: 5px; }
 :where(section,article,div,details)[id] { scroll-margin-top: 110px; }
