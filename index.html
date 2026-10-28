@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="site-entry.js?v=cover-20261028"></script>
   <title>傩面万象｜认识文化，创作心意</title>
   <style>
     :root {
@@ -3546,7 +3547,7 @@
   <link rel="stylesheet" href="fonts.css?v=20261007">
   <link rel="stylesheet" href="color-picker.css?v=type-20261007">
   <link rel="stylesheet" href="spacing.css?v=spacing-system-20261008">
-  <link rel="stylesheet" href="journey.css?v=quiet-reading-20261015">
+  <link rel="stylesheet" href="journey.css?v=site-qr-20261028">
   <link rel="stylesheet" href="research-layout.css?v=timeline-rows-20261028">
   <link rel="stylesheet" href="region-browser.css?v=spacing-system-20261008">
   <link rel="stylesheet" href="typography.css?v=atlas-layout-20261008">
@@ -3594,6 +3595,7 @@
             <span class="index">从江西萍乡湘东出发</span>
             <p class="hero-sub">认识面具背后的角色与地方故事，留下打动你的参考，再把自己的期待或关心，做成一张可以珍藏、赠送的作品卡。</p>
             <div class="journey-actions"><a class="journey-button primary" href="#journey-intro">开始认识傩面</a><a class="journey-text-link" href="#example-card">看看完成的作品</a></div>
+            <button class="hero-qr-entry" id="openSiteQr" type="button" aria-haspopup="dialog" aria-controls="siteQrDialog"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="3" y="15" width="6" height="6" rx="1"/><path d="M15 15h3v3h3v3h-6v-3m6-6v3M3 12h9V3m0 12v6"/></svg><span>扫码进入</span></button>
           </aside>
         </div>
       </div>
@@ -3603,6 +3605,15 @@
     </div>
     </header>
   </div>
+
+  <dialog class="site-qr-dialog" id="siteQrDialog" aria-labelledby="siteQrTitle" aria-describedby="siteQrHint">
+    <div class="site-qr-heading"><h2 id="siteQrTitle">扫码进入</h2><form method="dialog"><button class="site-qr-close" aria-label="关闭二维码" autofocus><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></form></div>
+    <p id="siteQrHint">用手机相机扫描二维码，从首页开始探索傩面。</p>
+    <img class="site-qr-image" src="assets/share/site-qr.png" width="984" height="984" alt="傩面万象网站二维码" loading="lazy">
+    <p class="site-qr-help">也可以保存二维码，分享给朋友。</p>
+    <a class="journey-button primary" href="assets/share/site-qr.png" download="nuo-atlas-qr.png">保存二维码</a>
+    <a class="site-qr-url" href="https://penglihong626-web.github.io/nuo-atlas-bilingual/" data-i18n-skip>penglihong626-web.github.io/nuo-atlas-bilingual/</a>
+  </dialog>
 
   <main class="content" id="journeyContent">
     <section class="journey-section" id="journey-intro">
@@ -4181,7 +4192,7 @@
 
 
 </main>
-  <script src="locales/site-en.js?v=hero-20261015"></script>
+  <script src="locales/site-en.js?v=site-qr-20261028"></script>
   <script src="locales/content-en.js?v=en-20261014c"></script>
   <script src="locales/archive-en.js?v=en-20261014c"></script>
   <script src="locales/interactive-en.js?v=en-20261014c"></script>
