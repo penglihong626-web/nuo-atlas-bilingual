@@ -56,6 +56,9 @@ body.journey-site .pair-photo-note { margin:0; color:var(--muted); font-size:var
 .pair-values { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-4); }
 .pair-values p { display:grid; align-content:start; gap:var(--space-2); margin:0; color:var(--muted); }
 .pair-values b { color:var(--ink); font-weight:500; font-size:var(--type-control); }
+@media(min-width:901px) {
+  #compare-section .deck-control { align-self:stretch; }
+}
 @media(max-width:900px) {
   #compare-section .deck-shell { grid-template-columns:minmax(0,1fr); }
   #research-library #compare-section .deck-tabs { grid-template-columns:repeat(3,minmax(0,1fr)); }

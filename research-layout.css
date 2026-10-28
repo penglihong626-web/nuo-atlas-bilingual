@@ -255,7 +255,7 @@
 }
 
 /* A group starts once: avoid adding both a parent's gap and its child's margin. */
-#research-library .timeline-track { gap: var(--layout-card-space); padding-block: 0 var(--space-2); }
+#research-library .timeline-track { column-gap: var(--layout-card-space); padding-block: 0 var(--space-2); }
 #research-library .period-figure { margin: var(--layout-card-space) 0 0; }
 #research-library .period-card h3 { margin-bottom: var(--layout-title-space); }
 #research-library .period-figure figcaption { gap: var(--space-2); margin-top: var(--space-4); }

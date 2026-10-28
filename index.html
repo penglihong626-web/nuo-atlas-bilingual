@@ -451,8 +451,9 @@
       display: grid;
       grid-auto-flow: column;
       grid-auto-columns: clamp(280px, 29vw, 360px);
-      align-items: start;
-      gap: 18px;
+      grid-template-rows: repeat(7, auto);
+      align-items: stretch;
+      gap: 0 18px;
       padding: 24px 2px;
       overflow-x: auto;
       scroll-snap-type: x mandatory;
@@ -462,6 +463,10 @@
 
     .period-card {
       position: relative;
+      display: grid;
+      grid-row: span 7;
+      grid-template-rows: subgrid;
+      row-gap: 0;
       scroll-snap-align: center;
       border: 1px solid rgba(255,240,210,.14);
       border-radius: 28px;
@@ -498,7 +503,7 @@
       font-size: 14px;
     }
 
-    .period-figure { margin: 20px 0 0; }
+    .period-figure { display: grid; grid-row: span 5; grid-template-rows: subgrid; row-gap: 0; margin: 20px 0 0; }
     .period-art {
       height: 240px;
       padding: 12px;
@@ -513,12 +518,13 @@
       object-fit: contain;
       filter: sepia(.55);
     }
-    .period-figure figcaption { display: grid; gap: 6px; margin-top: 16px; }
+    .period-figure figcaption { display: grid; grid-row: span 4; grid-template-rows: subgrid; gap: 6px; margin-top: 16px; }
     .period-figure strong { font: 600 var(--type-subtitle)/1.6 var(--sans); color: var(--ink); }
     .period-figure small { display: block; color: var(--gold-hot); }
     .period-caption-note { color: var(--muted); font: 400 var(--type-meta)/1.75 var(--sans); }
     .period-figure a {
       display: inline-flex;
+      align-self: start;
       align-items: center;
       min-height: 44px;
       width: fit-content;
@@ -3521,7 +3527,7 @@
     }
   </style>
 
-  <link rel="stylesheet" href="global-compare-styles.css?v=photos-only-20261008">
+  <link rel="stylesheet" href="global-compare-styles.css?v=align-panels-20261028">
   <style>
     /* These chapter headings stay visible while their content is explored. */
     #global-compare .section-meta,
@@ -3541,7 +3547,7 @@
   <link rel="stylesheet" href="color-picker.css?v=type-20261007">
   <link rel="stylesheet" href="spacing.css?v=spacing-system-20261008">
   <link rel="stylesheet" href="journey.css?v=quiet-reading-20261015">
-  <link rel="stylesheet" href="research-layout.css?v=compact-metrics-20261008">
+  <link rel="stylesheet" href="research-layout.css?v=timeline-rows-20261028">
   <link rel="stylesheet" href="region-browser.css?v=spacing-system-20261008">
   <link rel="stylesheet" href="typography.css?v=atlas-layout-20261008">
   <link rel="stylesheet" href="color-atlas.css?v=four-layers-20261008">
