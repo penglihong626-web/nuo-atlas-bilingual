@@ -13,9 +13,11 @@ function setup(seed = {}, options = {}) {
   const writes = [], exportedText = [], scrolls = [], focused = [], hashChanges = [];
   const exportOrder=[], exportCanvases=[], revokedURLs=[], measuredFonts=[], paintedFonts=[];
   const frames=[];
-  const location={hash:options.hash || '',pathname:'/nuo-atlas/',search:'?round=2'};
+  const location={hash:options.hash || '',pathname:'/nuo-atlas/',search:'?round=2',assign(url){this.assigned=url;}};
   const exportContext={measureText(text){measuredFonts.push(this.font);return {width:text.length*24};},scale(){},fillRect(){},strokeRect(){},drawImage(){exportOrder.push('image');},fillText(text){exportedText.push(text);exportOrder.push(text);paintedFonts.push({text,font:this.font});}};
   const storage = new Map(Object.entries(seed).map(([key,value])=>[key,JSON.stringify(value)]));
+  const session = new Map();
+  const sessionStorage = {setItem(key,value){if(options.sessionFailure)throw new Error('QuotaExceeded');session.set(key,value);}};
   const elements = new Map();
   class Element {
     constructor(){this.events={};this.dataset={};this.value='';this.textContent='';this.innerHTML='';this.hidden=false;this.id='';this.disabled=false;this.open=false;}
@@ -66,12 +68,45 @@ function setup(seed = {}, options = {}) {
     for (const name of ['site', 'content', 'archive', 'interactive', 'intro-1', 'intro-2', 'intro-3']) vm.runInNewContext(fs.readFileSync(require('node:path').join(__dirname, '../locales/' + name + '-en.js'), 'utf8'), {window});
     window.NuoI18n = {t: text => window.NUO_EN[text] || text};
   }
-  vm.runInNewContext(source,{window,document,localStorage,history:{replaceState(_state,_title,hash){hashChanges.push(hash);location.hash=new URL(hash,'https://example.org/nuo-atlas/').hash;}},location,requestAnimationFrame:fn=>options.deferFrames?frames.push(fn):fn(),URL:ExportURL,Event,Intl,Date,crypto:window.crypto,console,setTimeout:()=>0,Image:ExportImage},{filename:'journey.js'});
+  vm.runInNewContext(source,{window,document,localStorage,sessionStorage,history:{replaceState(_state,_title,hash){hashChanges.push(hash);location.hash=new URL(hash,'https://example.org/nuo-atlas/').hash;}},location,requestAnimationFrame:fn=>options.deferFrames?frames.push(fn):fn(),URL:ExportURL,Event,Intl,Date,crypto:window.crypto,console,setTimeout:()=>0,Image:ExportImage},{filename:'journey.js'});
   const delegated = async (host,dataset)=>{const button=new Element();button.dataset=dataset;await (host===null?document:$(host)).emit('click',{target:button});return button;};
-  return {$,window,document,storage,delegated,scrolls,focused,hashChanges,location,flushFrames(){while(frames.length)frames.shift()();},referenceButtons,enterCount:()=>enterCount,editable:()=>editable,confirms:()=>confirms,setFail:key=>failKey=key,image:()=>image,writes,exportedText,exportOrder,exportCanvases,revokedURLs,measuredFonts,paintedFonts,resetCount:()=>resetCount,setRestoreFailure:()=>failRestore=true};
+  return {$,window,document,storage,session,delegated,scrolls,focused,hashChanges,location,flushFrames(){while(frames.length)frames.shift()();},referenceButtons,enterCount:()=>enterCount,editable:()=>editable,confirms:()=>confirms,setFail:key=>failKey=key,image:()=>image,writes,exportedText,exportOrder,exportCanvases,revokedURLs,measuredFonts,paintedFonts,resetCount:()=>resetCount,setRestoreFailure:()=>failRestore=true};
 }
 (async()=>{
   const saved={...validDraft,id:'saved-1',workId:'saved-1',date:'2026-10-03T00:00:00Z',image:PNG};
+  const customResult=setup({[DRAFT]:validDraft});
+  customResult.$('drawWorkName').value='最新定制稿';await customResult.$('drawWorkName').emit('input');
+  await customResult.$('customizeWork').emit('click');
+  const handoff=JSON.parse(customResult.session.get('nuo_custom_work_v1'));
+  assert.equal(handoff.origin,'result');assert.equal(handoff.work.title,'最新定制稿','customization uses the latest valid work');
+  assert.equal(handoff.work.image,PNG);assert.equal(customResult.location.assigned,'customize.html?lang=zh');
+  assert.equal(handoff.productionSourceId,null,'collected references do not identify the production base');
+  assert.deepEqual(handoff.references,[{id:1,name:'样本',region:'江西',note:'',sources:[{title:'原始资料',url:'https://example.org/mask/1'}]}]);
+  const customSaved=setup({[DRAFT]:{...validDraft,title:'保留的当前草稿'},[WORKS]:[saved]},{language:'en'});
+  const beforeCustomDraft=customSaved.storage.get(DRAWING);
+  await customSaved.delegated('savedWorks',{customizeWork:'saved-1'});
+  assert.equal(JSON.parse(customSaved.session.get('nuo_custom_work_v1')).origin,'saved');
+  assert.equal(JSON.parse(customSaved.session.get('nuo_custom_work_v1')).work.id,'saved-1');
+  assert.equal(customSaved.storage.get(DRAWING),beforeCustomDraft,'ordering a saved work does not replace the active drawing');
+  assert.equal(customSaved.location.assigned,'customize.html?lang=en');
+  assert.equal(customSaved.$('customOrdersLink').href,'customize.html?view=orders&lang=en');
+  for (const [drawing,expected] of [
+    [{version:3,template:{id:'panguan',sourceId:319},outline:{src:'assets/masks/0325.svg'}},317],
+    [{version:3,outline:{src:'assets/masks/0319.svg'}},319],
+    [{version:3,outline:{src:'https://example.org/assets/masks/0319.svg'}},null],
+    [{version:3,outline:{src:'assets/masks/9999.svg'}},null]
+  ]) {
+    const customBase=setup({[WORKS]:[{...saved,referenceNotes:{1:'保留冠饰的细节'},drawing}]});
+    await customBase.delegated('savedWorks',{customizeWork:'saved-1'});
+    const metadata=JSON.parse(customBase.session.get('nuo_custom_work_v1'));
+    assert.equal(metadata.productionSourceId,expected,'identify the actual trusted template or exact outline');
+    assert.equal(metadata.references.find(reference=>reference.id===1).note,'保留冠饰的细节');
+    assert.deepEqual(metadata.work.drawing,drawing,'production metadata does not rewrite the user drawing');
+  }
+  const customFailure=setup({[DRAFT]:validDraft},{sessionFailure:true});
+  await customFailure.$('customizeWork').emit('click');
+  assert.equal(customFailure.location.assigned,undefined,'a failed handoff does not navigate away');
+  assert.match(customFailure.$('resultStatus').textContent,/当前作品仍保留/);
   const shortcut=setup();
   delete shortcut.$('research-library').open; // The library is an ordinary container, revealed by navigation.
   shortcut.$('siteMenu').open=true;

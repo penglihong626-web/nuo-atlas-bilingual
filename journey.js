@@ -10,6 +10,8 @@
   const $ = id => document.getElementById(id);
   const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const tx = (text, values = {}) => (window.NuoI18n?.t(text) || text).replace(/\{(\w+)\}/g, (_, key) => values[key] ?? '{' + key + '}');
+  const customLanguage = window.NuoI18n?.lang === 'en' || document.documentElement?.lang === 'en' ? 'en' : 'zh';
+  $('customOrdersLink').href = 'customize.html?view=orders&lang=' + customLanguage;
   const userText = value => `<span data-i18n-skip>${esc(value)}</span>`;
   const short = (s, max) => typeof s === 'string' ? s.slice(0, max) : '';
   const validPNG = value => typeof value === 'string' && value.length < 6000000 && /^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(value);
@@ -353,6 +355,24 @@
   }
   window.addEventListener('nuo:finish',finish);
   $('finishFromExplanation').addEventListener('click',finish);
+  function openCustomization(work, origin, statusId) {
+    try {
+      const outline = /^assets\/masks\/(\d{4})\.svg$/.exec(work.drawing?.outline?.src || '');
+      const productionSourceId = drawingTemplate(work.drawing)?.sourceId || (outline && archive.has(Number(outline[1])) ? Number(outline[1]) : null);
+      const references = work.referenceIds.map(ref).filter(Boolean).map(source => ({
+        id: source.id, name: source.name, region: source.region,
+        note: work.referenceNotes[source.id] || '',
+        sources: source.sources.map(({title, url}) => ({title, url}))
+      }));
+      sessionStorage.setItem('nuo_custom_work_v1', JSON.stringify({work, origin, productionSourceId, references}));
+      location.assign('customize.html?lang=' + customLanguage);
+    } catch (_) {
+      notice(statusId,'暂时无法打开定制演示，当前作品仍保留。请先下载作品卡，再重试。',true);
+    }
+  }
+  $('customizeWork').addEventListener('click',()=>{
+    if (finish(false)) openCustomization(currentCard, 'result', 'resultStatus');
+  });
   $('editWork').addEventListener('click',()=>{if(ready()){window.NuoDrawing.enter();go('galaxy');}});
   function persistWorks(next, statusId) {
     try { localStorage.setItem(WORKS_KEY,JSON.stringify(next)); works=next; return true; }
@@ -375,13 +395,14 @@
     }
   });
   function renderWorks() {
-    $('savedWorks').innerHTML = works.length?works.map(w=>`<article class="saved-work"><img data-i18n-skip src="${w.image}" alt="${esc(tx('{title}的创作图像', {title:w.title}))}" loading="lazy"><h3 data-i18n-skip>${esc(w.title)}</h3><p>${esc(dateText(w.date))} · ${w.target==='gift'?'赠予作品':'自我留存'}</p><p data-i18n-skip>${esc(w.wish)}</p><div class="journey-actions"><button class="journey-text-link" type="button" data-open-work="${esc(w.id)}">重新打开</button><button class="journey-text-link" type="button" data-export-work="${esc(w.id)}">下载</button><button class="journey-text-link" type="button" data-delete-work="${esc(w.id)}">删除</button></div></article>`).join(''):'<p class="empty-state">还没有保存的作品。完成创作后，它会带着心意与文化参考一起留在这里。</p>';
+    $('savedWorks').innerHTML = works.length?works.map(w=>`<article class="saved-work"><img data-i18n-skip src="${w.image}" alt="${esc(tx('{title}的创作图像', {title:w.title}))}" loading="lazy"><h3 data-i18n-skip>${esc(w.title)}</h3><p>${esc(dateText(w.date))} · ${w.target==='gift'?'赠予作品':'自我留存'}</p><p data-i18n-skip>${esc(w.wish)}</p><div class="journey-actions"><button class="journey-text-link" type="button" data-open-work="${esc(w.id)}">重新打开</button><button class="journey-text-link" type="button" data-export-work="${esc(w.id)}">下载</button><button class="journey-text-link" type="button" data-delete-work="${esc(w.id)}">删除</button></div><button class="journey-button saved-work-customize" type="button" data-customize-work="${esc(w.id)}">定制这件作品</button><p class="field-note">定制流程演示，不会产生真实订单。</p></article>`).join(''):'<p class="empty-state">还没有保存的作品。完成创作后，它会带着心意与文化参考一起留在这里。</p>';
   }
   function mayReplace() { return !hasDraft() || !dirty && works.some(w=>w.id===draft.workId) || window.confirm(tx('当前草稿将被替换。已保存到“我的作品”的内容会保留。要继续吗？')); }
   $('savedWorks').addEventListener('click',async event=>{
     const button=event.target.closest('button');if(!button)return;
-    const id=button.dataset.openWork||button.dataset.exportWork||button.dataset.deleteWork;
+    const id=button.dataset.openWork||button.dataset.exportWork||button.dataset.deleteWork||button.dataset.customizeWork;
     const work=works.find(w=>w.id===id);if(!work)return;
+    if(button.dataset.customizeWork){openCustomization(work, 'saved', 'worksStatus');return;}
     if(button.dataset.exportWork){await download(work,'worksStatus');return;}
     if(button.dataset.deleteWork){
       if(window.confirm(tx('从此浏览器删除“{title}”？下载过的文件不会受影响。', {title:work.title}))&&persistWorks(works.filter(w=>w.id!==id),'worksStatus')){renderWorks();notice('worksStatus','已删除本机作品。');}return;

@@ -195,12 +195,18 @@ html, body.journey-site { touch-action: manipulation; }
 .card-sources a { color: var(--gold-hot); font-size: var(--type-meta); text-decoration: underline; text-underline-offset: 4px; }
 .result-actions { position: sticky; top: 110px; }
 .result-actions .journey-button { display: flex; width: 100%; margin: var(--space-3) 0; }
+.customize-entry { margin-top: var(--space-8); padding: var(--layout-card-space); border: 1px solid #806541; background: #21180f; }
+.customize-entry h3 { margin: 0 0 var(--space-3); }
+.customize-entry .journey-button { margin: var(--space-4) 0 var(--space-3); }
+.works-heading-actions { display: flex; align-items: center; justify-content: flex-end; gap: var(--space-4); flex-wrap: wrap; }
 .saved-works { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--layout-card-space); }
 .saved-work { border: 1px solid var(--line); background: #1a120d; padding: var(--layout-card-space); min-width: 0; }
 .saved-work img { width: 100%; height: 220px; object-fit: contain; background: #0e0906; }
 .saved-work h3 { margin: var(--space-4) 0 var(--space-2); overflow-wrap: anywhere; }
 .saved-work p { font-size: var(--type-meta); overflow-wrap: anywhere; }
 .saved-work .journey-actions { gap: 16px; margin-top: 8px; }
+.saved-work-customize { margin-top: var(--space-6); }
+.saved-work-customize + .field-note { margin-top: var(--space-2); }
 /* Text within one group is close; a new group is separated by the larger role. */
 :is(.intro-copy, .example-work, .sample-copy, .result-actions, .saved-work, .card-sources) p + p { margin-top: var(--space-3); }
 .finished-card > p + p { margin-top: var(--space-3); }
