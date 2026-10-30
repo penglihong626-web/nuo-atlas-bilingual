@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const source = fs.readFileSync(require('node:path').join(__dirname, '../starmap_archive_app.js'), 'utf8');
 
-function setup({observer = false, count = 1, near = true, visible = true} = {}) {
+function setup({observer = false, count = 1, near = true, visible = true, width = 375, caseIds = [1]} = {}) {
   const elements = new Map(), emitted = [], references = new Set();
   const frames = new Map(), images = [];
   let frameNumber = 0, time = 1, observeScene, observeArchive;
@@ -43,7 +43,7 @@ function setup({observer = false, count = 1, near = true, visible = true} = {}) 
     replaceChildren(...children) { this.children = children; }
     querySelector() { return this.input ||= new Element(); }
     querySelectorAll() { return []; }
-    closest() { return this; }
+    closest(selector) { return selector === '.archive-detail' ? $('archiveDetail') : this; }
     setAttribute(key, value) { this.attributes[key] = value; }
     removeAttribute(key) { delete this.attributes[key]; }
     getBoundingClientRect() { return {left: 0, top: 0, right: 375, bottom: 480, width: 375, height: 480}; }
@@ -58,6 +58,7 @@ function setup({observer = false, count = 1, near = true, visible = true} = {}) 
   const document = new Element(); document.getElementById = $; document.createElement = () => { const element = new Element(); element.localContext = {...context, circles: []}; return element; };
   document.body = new Element();
   const window = new Element();
+  window.innerWidth = width;
   class IntersectionObserver {
     constructor(callback, options = {}) {
       const update = active => { if (!this.disconnected) callback([{isIntersecting: active}]); };
@@ -74,7 +75,7 @@ function setup({observer = false, count = 1, near = true, visible = true} = {}) 
     nodes: Array.from({length: count}, (_, index) => ({id: index + 1, name: '测试面具', idText: '0001', region: '江西', province: '江西',
       roleType: '神灵信仰类', faceShape: '圆形', semantic: '仪式角色', image: `mask-${index + 1}.svg`,
       xRegion: .1, yRegion: .15, detailUrl: 'https://example.org/mask/1'})),
-    meta: {total: count, caseIds: [1]}, colors: {'神灵信仰类': '#ffe4a3'},
+    meta: {total: count, caseIds}, colors: {'神灵信仰类': '#ffe4a3'},
     stats: {roleType: [['神灵信仰类', 1]], faceShape: [['圆形', 1]], province: [['江西', 1]]},
   };
   class CustomEvent { constructor(type, options) { this.type = type; this.detail = options.detail; } }
@@ -151,6 +152,19 @@ assert.equal(refs.emitted[0].detail.id, 1);
 refs.references.clear(); refs.tap();
 assert.equal(refs.reference.textContent, '加入创作参考', 'a removed reference is not shown as selected');
 console.log('PASS: atlas tap/drag separation, independent pointer IDs, pinch zoom and rebasing, cancel/lost-capture recovery, native browser zoom, saved-reference feedback, no focus/scroll.');
+
+for (const width of [1080, 1081, 1440]) {
+  const details = setup({count: 2, caseIds: [1, 2], width});
+  const pane = details.$('archiveDetail');
+  pane.scrollTop = 240;
+  details.$('caseList').children[1].emit('click');
+  assert.equal(pane.scrollTop, width >= 1081 ? 0 : 240,
+    'a different mask resets only the desktop detail pane, leaving mobile reading alone');
+  pane.scrollTop = 240;
+  details.$('caseList').children[1].emit('click');
+  assert.equal(pane.scrollTop, 240, 'refreshing the current mask preserves its reading position');
+}
+console.log('PASS: new desktop selection starts details at the top; current selection and mobile keep their reading position.');
 
 const batched = setup({observer: true, count: 483});
 batched.canvas.emit('pointerdown');

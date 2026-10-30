@@ -1,0 +1,66 @@
+/* Desktop reading uses the full content rail. Smaller layouts retain their
+   existing type sizes, wrapping and natural-height panels. */
+@media (min-width: 1081px) {
+  body.journey-site :is(.journey-heading, .section-meta, .section-title,
+    .section-desc, .journey-heading > p:last-child, .culture-guide > p,
+    .workshop-context p, .workshop-first-step),
+  #research-library .section-inner > .research-note {
+    width: 100%;
+    max-width: none;
+  }
+
+  body.journey-site h2.section-title {
+    text-wrap: wrap;
+  }
+}
+
+/* Let the chart and filters set the desktop row height; longer mask details
+   scroll within their equal-height column instead of stretching all three. */
+@media (min-width: 1081px) {
+  #research-library #atlas .archive-workspace {
+    align-items: stretch;
+  }
+
+  #research-library #atlas .archive-detail {
+    min-height: 0;
+    contain: size;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold) rgba(255, 240, 210, .05);
+  }
+
+  #research-library #atlas .archive-detail::-webkit-scrollbar { width: 6px; }
+  #research-library #atlas .archive-detail::-webkit-scrollbar-thumb {
+    background: var(--gold);
+    border-radius: 999px;
+  }
+}
+
+/* Desktop comparison controls sit above the full-width pair; touch layouts keep
+   their existing flow and dimensions. */
+@media (min-width: 1081px) {
+  #research-library #compare-section .deck-shell {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--layout-card-space);
+  }
+
+  #research-library #compare-section .deck-control {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 240px;
+    align-items: center;
+    align-self: start;
+    gap: var(--layout-card-space);
+  }
+
+  #research-library #compare-section .deck-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 0;
+  }
+
+  #research-library #compare-section .deck-tab {
+    justify-content: center;
+    text-align: center;
+  }
+}

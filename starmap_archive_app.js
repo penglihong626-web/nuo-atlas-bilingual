@@ -639,7 +639,11 @@
   function selectNode(id) {
     const node = atlas.nodes.find((item) => item.id === id) || atlas.nodes[0];
     if (!node) return;
+    const selectionChanged = state.selectedId !== node.id;
     state.selectedId = node.id;
+    if (selectionChanged && window.innerWidth >= 1081) {
+      els.detailImage.closest(".archive-detail").scrollTop = 0;
+    }
     els.detailImage.src = node.image;
     els.detailImage.alt = node.name;
     els.detailMeta.textContent = `${node.idText} / ${node.region}`;
